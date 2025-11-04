@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DeepBlue Capital Partners</title>
+    <title>Deepblue Capital Partners</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -12,204 +15,219 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: #ffffff;
-            color: #1a1a1a;
+            font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(180deg, #f7f9fe 0%, #f5f7fc 55%, #eef2fb 100%);
+            color: #0b1220;
             line-height: 1.6;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Logo */
-        .logo {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            width: 120px;
-            height: auto;
-            z-index: 1000;
-        }
-
-        /* Header */
-        header {
-            padding: 80px 40px 120px;
-            max-width: 1200px;
+        .hero {
+            position: relative;
+            padding: 160px 40px 100px;
+            max-width: 1080px;
             margin: 0 auto;
             text-align: center;
         }
 
-        .brand {
-            font-size: 14px;
+        .brand-mark {
+            position: absolute;
+            top: 48px;
+            left: 48px;
+            width: clamp(86px, 9vw, 108px);
+            height: auto;
+            border-radius: 24px;
+            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.18);
+        }
+
+        .hero-title {
+            position: relative;
+            display: inline-block;
+            font-family: 'Sora', 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-size: clamp(52px, 7vw, 76px);
             font-weight: 600;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: #6b7280;
-            margin-bottom: 24px;
+            letter-spacing: -0.035em;
+            color: #0b1428;
+            padding: 0 48px;
         }
 
-        h1 {
-            font-size: 56px;
-            font-weight: 700;
-            color: #0f172a;
-            margin-bottom: 24px;
-            letter-spacing: -0.02em;
+        .hero-title::after {
+            content: '';
+            position: absolute;
+            right: -26px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: clamp(110px, 14vw, 180px);
+            height: clamp(28px, 5vw, 46px);
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 100%);
+            filter: blur(14px);
+            opacity: 0.9;
+            z-index: -1;
         }
 
-        .subtitle {
-            font-size: 20px;
-            color: #64748b;
-            font-weight: 400;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        /* Main Content */
         main {
-            max-width: 1200px;
+            flex: 1;
+            width: 100%;
+        }
+
+        .content {
+            max-width: 1020px;
             margin: 0 auto;
-            padding: 0 40px 120px;
+            padding: 0 40px 140px;
         }
 
         .section-title {
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: #6b7280;
-            margin-bottom: 40px;
+            letter-spacing: 0.28em;
+            color: #8b97b0;
+            margin-bottom: 36px;
         }
 
-        /* Project Grid */
         .projects {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            display: flex;
+            flex-direction: column;
             gap: 32px;
         }
 
         .project-card {
+            width: min(100%, 440px);
             background: #ffffff;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 40px;
+            border-radius: 28px;
+            padding: 42px 44px;
             text-decoration: none;
             color: inherit;
-            display: block;
-            transition: all 0.2s ease;
+            box-shadow: 0 30px 70px rgba(15, 23, 42, 0.12);
+            border: 1px solid rgba(148, 163, 184, 0.24);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
         }
 
         .project-card:hover {
-            border-color: #2563eb;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+            transform: translate3d(0, -6px, 0);
+            box-shadow: 0 36px 80px rgba(37, 99, 235, 0.18);
         }
 
         .project-tag {
-            display: inline-block;
-            font-size: 12px;
-            font-weight: 600;
+            font-size: 11px;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #2563eb;
-            margin-bottom: 16px;
+            letter-spacing: 0.2em;
+            color: #2951ff;
+            margin-bottom: 18px;
         }
 
         .project-card h2 {
             font-size: 24px;
             font-weight: 600;
-            color: #0f172a;
-            margin-bottom: 12px;
             letter-spacing: -0.01em;
+            color: #0d152e;
+            margin-bottom: 12px;
         }
 
         .project-card p {
-            color: #64748b;
+            color: #64708b;
             font-size: 16px;
-            line-height: 1.7;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
         .project-link {
             display: inline-flex;
             align-items: center;
+            gap: 8px;
             font-size: 14px;
             font-weight: 600;
-            color: #2563eb;
-            transition: gap 0.2s ease;
-            gap: 8px;
+            color: #3061ff;
         }
 
         .project-card:hover .project-link {
             gap: 12px;
         }
 
-        .arrow {
-            font-size: 16px;
-        }
-
-        /* Footer */
         footer {
-            border-top: 1px solid #e5e7eb;
-            padding: 40px;
+            border-top: 1px solid rgba(148, 163, 184, 0.32);
+            padding: 36px 40px;
             text-align: center;
-        }
-
-        footer p {
             font-size: 14px;
-            color: #6b7280;
+            color: #8691a7;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            header {
-                padding: 60px 24px 80px;
+        @media (max-width: 900px) {
+            .hero {
+                padding: 150px 32px 90px;
             }
 
-            h1 {
-                font-size: 36px;
+            .brand-mark {
+                top: 36px;
+                left: 32px;
+                width: clamp(74px, 12vw, 96px);
             }
 
-            .subtitle {
-                font-size: 18px;
+            .content {
+                padding: 0 32px 110px;
+            }
+        }
+
+        @media (max-width: 680px) {
+            .hero {
+                padding: 140px 24px 90px;
             }
 
-            main {
-                padding: 0 24px 80px;
+            .brand-mark {
+                position: static;
+                margin: 0 auto 32px;
+                display: block;
             }
 
-            .projects {
-                grid-template-columns: 1fr;
-                gap: 24px;
+            .hero-title {
+                padding: 0;
+            }
+
+            .hero-title::after {
+                right: -10px;
+                width: clamp(90px, 36vw, 140px);
+            }
+
+            .content {
+                padding: 0 24px 90px;
             }
 
             .project-card {
-                padding: 32px;
+                width: 100%;
             }
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>DeepBlue Capital Partners</h1>
+    <header class="hero">
+        <img src="image 1.png" alt="Deepblue Capital Partners emblem" class="brand-mark">
+        <h1 class="hero-title">Deepblue Capital Partners</h1>
     </header>
 
     <main>
-        <div class="section-title">Property Tours</div>
+        <div class="content">
+            <div class="section-title">Property Tours</div>
 
-        <div class="projects">
-            <a href="willow-ridge/" class="project-card">
-                <div class="project-tag">Tour</div>
-                <h2>Willow Ridge Comps Tour</h2>
-                <p>DFW - 10.29.25 - 10.30.25</p>
-                <span class="project-link">
-                    View Tour
-                    <span class="arrow">→</span>
-                </span>
-            </a>
+            <div class="projects">
+                <a href="willow-ridge/" class="project-card">
+                    <div class="project-tag">Tour</div>
+                    <h2>Willow Ridge Comps Tour</h2>
+                    <p>DFW &ndash; 10.29.25 &ndash; 10.30.25</p>
+                    <span class="project-link">
+                        View Tour
+                        <span aria-hidden="true">&rarr;</span>
+                    </span>
+                </a>
 
-            <!-- Add more property tours here -->
+                <!-- Add more property tours here -->
+            </div>
         </div>
     </main>
 
     <footer>
-        <p>&copy; 2025 DeepBlue Capital Partners. All rights reserved.</p>
+        &copy; 2025 Deepblue Capital Partners. All rights reserved.
     </footer>
 </body>
 </html>

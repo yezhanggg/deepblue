@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <script src="https://unpkg.com/leaflet.gridlayer.googlemutant@latest/dist/Leaflet.GoogleMutant.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+
+                /* Marker styles for better visibility */
+                .awesome-marker {
+                    filter: drop-shadow(0 0 2px white)
+                            drop-shadow(0 0 3px white)
+                            drop-shadow(0 2px 4px rgba(0,0,0,0.7)) !important;
+                }
+
+                .awesome-marker i {
+                    font-size: 20px !important;
+                }
+
+                /* Circle markers with better visibility */
+                .leaflet-interactive {
+                    stroke-width: 3 !important;
+                }
+
+                /* Label text with better visibility */
+                .empty div {
+                    text-shadow:
+                        -1px -1px 0 #000,
+                        1px -1px 0 #000,
+                        -1px 1px 0 #000,
+                        1px 1px 0 #000,
+                        0 0 5px rgba(0,0,0,0.8) !important;
+                    font-weight: 900 !important;
+                    font-size: 12px !important;
+                }
+
+                /* Modal styles */
+                .gallery-modal {
+                    display: none;
+                    position: fixed;
+                    z-index: 10000;
+                    left: 0;
+                    top: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(0,0,0,0.9);
+                }
+
+                .gallery-modal-content {
+                    position: relative;
+                    margin: 2% auto;
+                    width: 90%;
+                    height: 90%;
+                    background-color: white;
+                    border-radius: 8px;
+                    overflow: hidden;
+                }
+
+                .gallery-modal-header {
+                    background-color: #2E86AB;
+                    color: white;
+                    padding: 15px 20px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+
+                .gallery-modal-close {
+                    color: white;
+                    font-size: 28px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    background: none;
+                    border: none;
+                }
+
+                .gallery-modal-close:hover {
+                    color: #ccc;
+                }
+
+                .gallery-modal-body {
+                    width: 100%;
+                    height: calc(100% - 60px);
+                }
+
+                .gallery-modal iframe {
+                    width: 100%;
+                    height: 100%;
+                    border: none;
+                }
+
+                .drive-buttons {
+                    display: flex;
+                    gap: 10px;
+                    margin-top: 10px;
+                }
+
+                .drive-btn {
+                    display: inline-block;
+                    padding: 8px 15px;
+                    background-color: white;
+                    color: #2E86AB;
+                    text-decoration: none;
+                    border-radius: 5px;
+                    font-size: 12px;
+                    cursor: pointer;
+                    border: 2px solid #2E86AB;
+                    transition: all 0.3s;
+                    font-weight: 600;
+                }
+
+                .drive-btn:hover {
+                    background-color: #2E86AB;
+                    color: white;
+                    text-decoration: none;
+                }
+
+                .drive-btn-gallery {
+                    background-color: white;
+                    color: #A23B72;
+                    border-color: #A23B72;
+                }
+
+                .drive-btn-gallery:hover {
+                    background-color: #A23B72;
+                    color: white;
+                }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@3.0.0/Control.FullScreen.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@3.0.0/Control.FullScreen.css"/>
+</head>
+<body>
+
+    <!-- Gallery Modal -->
+    <div id="galleryModal" class="gallery-modal">
+        <div class="gallery-modal-content">
+            <div class="gallery-modal-header">
+                <h3 id="modalTitle" style="margin: 0;">Property Photos</h3>
+                <button class="gallery-modal-close" onclick="closeGallery()">&times;</button>
+            </div>
+            <div class="gallery-modal-body">
+                <iframe id="galleryFrame" src=""></iframe>
+            </div>
+        </div>
+    </div>
+
+    <div style="position: fixed;
+                top: 10px;
+                left: 50px;
+                width: 550px;
+                height: 90px;
+                background-color: white;
+                border: 2px solid #2E86AB;
+                z-index: 9999;
+                font-size: 16px;
+                padding: 10px;
+                border-radius: 5px;
+                box-shadow: 0 0 10px rgba(0,0,0,0.3);">
+        <h3 style="margin: 0; color: #2E86AB;">Deepblue Capital Partners</h3>
+        <h4 style="margin: 5px 0; color: #A23B72;">Willow Ridge Comps Tour (10.29.25 - 10.30.25)</h4>
+        <p style="margin: 5px 0; font-size: 12px; color: #666;">
+            Total Properties: 8
+        </p>
+    </div>
+
+
+    <div style="position: fixed;
+                bottom: 50px;
+                left: 50px;
+                width: 200px;
+                background-color: white;
+                border: 2px solid #2E86AB;
+                z-index: 9999;
+                font-size: 12px;
+                padding: 10px;
+                border-radius: 5px;
+                box-shadow: 0 0 10px rgba(0,0,0,0.3);">
+        <h4 style="margin: 0 0 10px 0; color: #2E86AB;">Legend</h4>
+        <p style="margin: 5px 0;">
+            <span style="color: #2E86AB;">●</span> Photos Only<br>
+            <span style="color: #F18F01;">●</span> Videos Only<br>
+            <span style="color: #A23B72;">●</span> Photos + Videos
+        </p>
+    </div>
+
+
+            <div class="folium-map" id="map" ></div>
+
+</body>
+<script>
+    // Gallery modal functions
+    function openGallery(folderId, propertyName) {
+        const modal = document.getElementById('galleryModal');
+        const frame = document.getElementById('galleryFrame');
+        const title = document.getElementById('modalTitle');
+
+        title.textContent = propertyName + ' - Photo Gallery';
+        frame.src = 'https://drive.google.com/embeddedfolderview?id=' + folderId + '#grid';
+        modal.style.display = 'block';
+    }
+
+    function closeGallery() {
+        const modal = document.getElementById('galleryModal');
+        const frame = document.getElementById('galleryFrame');
+
+        modal.style.display = 'none';
+        frame.src = '';
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('galleryModal');
+        if (event.target == modal) {
+            closeGallery();
+        }
+    }
+
+
+            var map = L.map(
+                "map",
+                {
+                    center: [32.857145486111115, -97.10528645833334],
+                    crs: L.CRS.EPSG3857,
+                    zoom: 12,
+                    zoomControl: true,
+                    preferCanvas: false
+                }
+            );
+
+
+
+
+
+            var googleLayer = L.gridLayer.googleMutant({
+                type: 'roadmap',
+                maxZoom: 21
+            });
+
+            googleLayer.addTo(map);
+
+            // Load Google Maps API
+            var script = document.createElement('script');
+            script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyCSbLWOtlLpFN4pQuuaTnr3-e48oE1fN-o';
+            document.head.appendChild(script);
+
+
+            var marker_osiszn5f8tnnq5jdnajsaamizx0vcg9f = L.marker(
+                [32.8550305555556, -97.1120305555555],
+                {}
+            ).addTo(map);
+
+
+            var icon_fksd52ypz7uzo3msngxte4ldc7uay1fl = L.AwesomeMarkers.icon(
+                {
+                    markerColor: "white",
+                    iconColor: "#A23B72",
+                    icon: "star",
+                    prefix: "fa",
+                    extraClasses: "fa-rotate-0"
+                }
+            );
+
+
+        var popup_2e7561r85tumrqrvcqa6fdinbqiolguo = L.popup({
+            maxWidth: 350
+        });
+
+
+
+                var html_oy7ee5oxnel88ptf7fq5wf5k8jcdxuna = $(`<div id="html_oy7ee5oxnel88ptf7fq5wf5k8jcdxuna" style="width: 100.0%; height: 100.0%;">
+        <div style="width: 300px; font-family: Arial, sans-serif;">
+            <h4 style="margin: 0 0 10px 0; color: #2E86AB;">3001 Crystal Springs</h4>
+            <p style="margin: 5px 0;"><strong>3001 Crystal Springs Street</strong></p>
+            <p style="margin: 5px 0; font-size: 12px;">Bedford, TX 76021</p>
+            <hr style="margin: 10px 0;">
+            <p style="margin: 5px 0; font-size: 11px;">
+                📅 October 29, 2025 (Wednesday)<br>
+                📁 22 files (21 photos, 1 videos)
+            </p>
+            <a href="https://www.google.com/maps?q=32.8550305555556,-97.1120305555555" target="_blank" style="font-size: 11px; color: #2E86AB;">
+                📍 View on Google Maps
+            </a>
+            
+            <div class="drive-buttons">
+                <a href="https://drive.google.com/open?id=135q3aAueFuYbQ6nAIk1hSv9CirEOHXir&usp=drive_copy" target="_blank" class="drive-btn">
+                    📁 Open Folder
+                </a>
+                <button onclick="openGallery('135q3aAueFuYbQ6nAIk1hSv9CirEOHXir', '3001 Crystal Springs')" class="drive-btn drive-btn-gallery">
+                    🖼️ View Gallery
+                </button>
+            </div>
+        
+        </div>
+    </div>`)[0];
+                popup_2e7561r85tumrqrvcqa6fdinbqiolguo.setContent(html_oy7ee5oxnel88ptf7fq5wf5k8jcdxuna);
+
+
+
+        marker_osiszn5f8tnnq5jdnajsaamizx0vcg9f.bindPopup(popup_2e7561r85tumrqrvcqa6fdinbqiolguo)
+        ;
+
+
+
+
+            marker_osiszn5f8tnnq5jdnajsaamizx0vcg9f.bindTooltip(
+                `<div>
+                     3001 Crystal Springs: 3001 Crystal Springs Street
+                 </div>`,
+                {
+                    sticky: true
+                }
+            );
+
+
+                marker_osiszn5f8tnnq5jdnajsaamizx0vcg9f.setIcon(icon_fksd52ypz7uzo3msngxte4ldc7uay1fl);
+
+
+            var circle_marker_61bpc2k5p8cucwf08r7y1xjju53v8zae = L.circleMarker(
+                [32.8550305555556, -97.1120305555555],
+                {"bubblingMouseEvents": true, "color": "#A23B72", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#A23B72", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
+            ).addTo(map);
+
+
+
+
+            var marker_unfsa6nj61vpjlb6b79sfy6an6uaqmen = L.marker(
+                [32.8550305555556, -97.1120305555555],
+                {"interactive": false}
+            ).addTo(map);
+
+
+            var div_icon_uua0zr4ztquslqwjltkkhbggxk0qrcjh = L.divIcon({
+                html: `
+                <div style="font-size: 10px;
+                            font-weight: bold;
+                            color: white;
+                            text-align: center;
+                            margin-top: -20px;
+                            text-shadow: 1px 1px 2px black;">
+                    P1
+                </div>
+            `,
+                className: "empty"
+            });
+
+
+                marker_unfsa6nj61vpjlb6b79sfy6an6uaqmen.setIcon(div_icon_uua0zr4ztquslqwjltkkhbggxk0qrcjh);
+
+
+            var marker_h24qptjl28pzvgxq5w6j0rogf14ak8i4 = L.marker(
+                [32.8604666666667, -97.1538472222222],
+                {}
+            ).addTo(map);
+
+
+            var icon_gmgg2df64lbao09mksu34c7f148e61fd = L.AwesomeMarkers.icon(
+                {
+                    markerColor: "white",
+                    iconColor: "#A23B72",
+                    icon: "star",
+                    prefix: "fa",
+                    extraClasses: "fa-rotate-0"
+                }
+            );
+
+
+        var popup_ayqmd39r3ra8d1nfvxjlivbh603m4gbh = L.popup({
+            maxWidth: 350
+        });
+
+
+
+                var html_aw62uhcpdhc1ucqyoa85wktsris9n47r = $(`<div id="html_aw62uhcpdhc1ucqyoa85wktsris9n47r" style="width: 100.0%; height: 100.0%;">
+        <div style="width: 300px; font-family: Arial, sans-serif;">
+            <h4 style="margin: 0 0 10px 0; color: #2E86AB;">Bedford Hills</h4>
+            <p style="margin: 5px 0;"><strong>3532 Shady Brook Drive</strong></p>
+            <p style="margin: 5px 0; font-size: 12px;">Bedford, TX 76021</p>
+            <hr style="margin: 10px 0;">
+            <p style="margin: 5px 0; font-size: 11px;">
+                📅 October 29, 2025 (Wednesday)<br>
+                📁 18 files (15 photos, 3 videos)
+            </p>
+            <a href="https://www.google.com/maps?q=32.8604666666667,-97.1538472222222" target="_blank" style="font-size: 11px; color: #2E86AB;">
+                📍 View on Google Maps
+            </a>
+            
+            <div class="drive-buttons">
+                <a href="https://drive.google.com/open?id=1wuFE63-5YD3i6zMfgLZZMgl04aGt486i&usp=drive_copy" target="_blank" class="drive-btn">
+                    📁 Open Folder
+                </a>
+                <button onclick="openGallery('1wuFE63-5YD3i6zMfgLZZMgl04aGt486i', 'Bedford Hills')" class="drive-btn drive-btn-gallery">
+                    🖼️ View Gallery
+                </button>
+            </div>
+        
+        </div>
+    </div>`)[0];
+                popup_ayqmd39r3ra8d1nfvxjlivbh603m4gbh.setContent(html_aw62uhcpdhc1ucqyoa85wktsris9n47r);
+
+
+
+        marker_h24qptjl28pzvgxq5w6j0rogf14ak8i4.bindPopup(popup_ayqmd39r3ra8d1nfvxjlivbh603m4gbh)
+        ;
+
+
+
+
+            marker_h24qptjl28pzvgxq5w6j0rogf14ak8i4.bindTooltip(
+                `<div>
+                     Bedford Hills: 3532 Shady Brook Drive
+                 </div>`,
+                {
+                    sticky: true
+                }
+            );
+
+
+                marker_h24qptjl28pzvgxq5w6j0rogf14ak8i4.setIcon(icon_gmgg2df64lbao09mksu34c7f148e61fd);
+
+
+            var circle_marker_q7dz82qw63i0jt4ylalorn8j47wgf4n2 = L.circleMarker(
+                [32.8604666666667, -97.1538472222222],
+                {"bubblingMouseEvents": true, "color": "#A23B72", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#A23B72", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
+            ).addTo(map);
+
+
+
+
+            var marker_vgmbfadcza0qq26kfsxxgv2vao232txp = L.marker(
+                [32.8604666666667, -97.1538472222222],
+                {"interactive": false}
+            ).addTo(map);
+
+
+            var div_icon_lrqfo9159dwfw7n1ot9ql4pbxmjd3wic = L.divIcon({
+                html: `
+                <div style="font-size: 10px;
+                            font-weight: bold;
+                            color: white;
+                            text-align: center;
+                            margin-top: -20px;
+                            text-shadow: 1px 1px 2px black;">
+                    P2
+                </div>
+            `,
+                className: "empty"
+            });
+
+
+                marker_vgmbfadcza0qq26kfsxxgv2vao232txp.setIcon(div_icon_lrqfo9159dwfw7n1ot9ql4pbxmjd3wic);
+
+
+            var marker_iromq1tel4rogqig4hev4m6fr4lzh04c = L.marker(
+                [32.8500111111111, -97.110925],
+                {}
+            ).addTo(map);
+
+
+            var icon_3dhej4h5anj4ujy7b341japdosrd42wb = L.AwesomeMarkers.icon(
+                {
+                    markerColor: "white",
+                    iconColor: "#A23B72",
+                    icon: "star",
+                    prefix: "fa",
+                    extraClasses: "fa-rotate-0"
+                }
+            );
+
+
+        var popup_k5zxil7sjpnxsv14cil8xg5lsnk4uumb = L.popup({
+            maxWidth: 350
+        });
+
+
+
+                var html_v0jqz05uas5pc1qz669174qrd5z318x1 = $(`<div id="html_v0jqz05uas5pc1qz669174qrd5z318x1" style="width: 100.0%; height: 100.0%;">
+        <div style="width: 300px; font-family: Arial, sans-serif;">
+            <h4 style="margin: 0 0 10px 0; color: #2E86AB;">Harwood Hills</h4>
+            <p style="margin: 5px 0;"><strong>2452 Highway 121</strong></p>
+            <p style="margin: 5px 0; font-size: 12px;">Bedford, TX 76021</p>
+            <hr style="margin: 10px 0;">
+            <p style="margin: 5px 0; font-size: 11px;">
+                📅 October 30, 2025 (Thursday)<br>
+                📁 29 files (28 photos, 1 videos)
+            </p>
+            <a href="https://www.google.com/maps?q=32.8500111111111,-97.110925" target="_blank" style="font-size: 11px; color: #2E86AB;">
+                📍 View on Google Maps
+            </a>
+            
+            <div class="drive-buttons">
+                <a href="https://drive.google.com/open?id=1309fFLfb8QBIoH4cb_8EW-U8PsAgE4ml&usp=drive_copy" target="_blank" class="drive-btn">
+                    📁 Open Folder
+                </a>
+                <button onclick="openGallery('1309fFLfb8QBIoH4cb_8EW-U8PsAgE4ml', 'Harwood Hills')" class="drive-btn drive-btn-gallery">
+                    🖼️ View Gallery
+                </button>
+            </div>
+        
+        </div>
+    </div>`)[0];
+                popup_k5zxil7sjpnxsv14cil8xg5lsnk4uumb.setContent(html_v0jqz05uas5pc1qz669174qrd5z318x1);
+
+
+
+        marker_iromq1tel4rogqig4hev4m6fr4lzh04c.bindPopup(popup_k5zxil7sjpnxsv14cil8xg5lsnk4uumb)
+        ;
+
+
+
+
+            marker_iromq1tel4rogqig4hev4m6fr4lzh04c.bindTooltip(
+                `<div>
+                     Harwood Hills: 2452 Highway 121
+                 </div>`,
+                {
+                    sticky: true
+                }
+            );
+
+
+                marker_iromq1tel4rogqig4hev4m6fr4lzh04c.setIcon(icon_3dhej4h5anj4ujy7b341japdosrd42wb);
+
+
+            var circle_marker_lyn3lklg83y1y1vx6ln2cktfyoe9ufv9 = L.circleMarker(
+                [32.8500111111111, -97.110925],
+                {"bubblingMouseEvents": true, "color": "#A23B72", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#A23B72", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
+            ).addTo(map);
+
+
+
+
+            var marker_qib07014ajn9kzrv3rm8nsom8l9lmwmi = L.marker(
+                [32.8500111111111, -97.110925],
+                {"interactive": false}
+            ).addTo(map);
+
+
+            var div_icon_hvmca6v5y06lw6vldi803lp0qeiv6tyj = L.divIcon({
+                html: `
+                <div style="font-size: 10px;
+                            font-weight: bold;
+                            color: white;
+                            text-align: center;
+                            margin-top: -20px;
+                            text-shadow: 1px 1px 2px black;">
+                    P3
+                </div>
+            `,
+                className: "empty"
+            });
+
+
+                marker_qib07014ajn9kzrv3rm8nsom8l9lmwmi.setIcon(div_icon_hvmca6v5y06lw6vldi803lp0qeiv6tyj);
+
+
+            var marker_qe8hwkq8s2j1hb93ocjozt84ic55tc7p = L.marker(
+                [32.8509361111111, -97.1189277777778],
+                {}
+            ).addTo(map);
+
+
+            var icon_u5qv2ll3ehzz2uek1prmzicif56he1si = L.AwesomeMarkers.icon(
+                {
+                    markerColor: "white",
+                    iconColor: "#A23B72",
+                    icon: "star",
+                    prefix: "fa",
+                    extraClasses: "fa-rotate-0"
+                }
+            );
+
+
+        var popup_4gpevg1uu9n40g5minu3x4ika3dafo1d = L.popup({
+            maxWidth: 350
+        });
+
+
+
+                var html_15h1l1zpm1smelthafsn451wb2c7hox9 = $(`<div id="html_15h1l1zpm1smelthafsn451wb2c7hox9" style="width: 100.0%; height: 100.0%;">
+        <div style="width: 300px; font-family: Arial, sans-serif;">
+            <h4 style="margin: 0 0 10px 0; color: #2E86AB;">Huntington Glen</h4>
+            <p style="margin: 5px 0;"><strong>2900 Harwood Road</strong></p>
+            <p style="margin: 5px 0; font-size: 12px;">Bedford, TX 76021</p>
+            <hr style="margin: 10px 0;">
+            <p style="margin: 5px 0; font-size: 11px;">
+                📅 October 29, 2025 (Wednesday)<br>
+                📁 18 files (16 photos, 2 videos)
+            </p>
+            <a href="https://www.google.com/maps?q=32.8509361111111,-97.1189277777778" target="_blank" style="font-size: 11px; color: #2E86AB;">
+                📍 View on Google Maps
+            </a>
+            
+            <div class="drive-buttons">
+                <a href="https://drive.google.com/open?id=1hKqrJEAkhRkFdzRn3RmVsx5AOzOz7Kc9&usp=drive_copy" target="_blank" class="drive-btn">
+                    📁 Open Folder
+                </a>
+                <button onclick="openGallery('1hKqrJEAkhRkFdzRn3RmVsx5AOzOz7Kc9', 'Huntington Glen')" class="drive-btn drive-btn-gallery">
+                    🖼️ View Gallery
+                </button>
+            </div>
+        
+        </div>
+    </div>`)[0];
+                popup_4gpevg1uu9n40g5minu3x4ika3dafo1d.setContent(html_15h1l1zpm1smelthafsn451wb2c7hox9);
+
+
+
+        marker_qe8hwkq8s2j1hb93ocjozt84ic55tc7p.bindPopup(popup_4gpevg1uu9n40g5minu3x4ika3dafo1d)
+        ;
+
+
+
+
+            marker_qe8hwkq8s2j1hb93ocjozt84ic55tc7p.bindTooltip(
+                `<div>
+                     Huntington Glen: 2900 Harwood Road
+                 </div>`,
+                {
+                    sticky: true
+                }
+            );
+
+
+                marker_qe8hwkq8s2j1hb93ocjozt84ic55tc7p.setIcon(icon_u5qv2ll3ehzz2uek1prmzicif56he1si);
+
+
+            var circle_marker_qei4kpfwquvhfd16tnyrc8c8ze8nwtq3 = L.circleMarker(
+                [32.8509361111111, -97.1189277777778],
+                {"bubblingMouseEvents": true, "color": "#A23B72", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#A23B72", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
+            ).addTo(map);
+
+
+
+
+            var marker_xpa5znl8idwfr2dt39dsx4zfzdml5r6x = L.marker(
+                [32.8509361111111, -97.1189277777778],
+                {"interactive": false}
+            ).addTo(map);
+
+
+            var div_icon_3abp09xutvg8i2lwn9yn5b6fha1i5dhe = L.divIcon({
+                html: `
+                <div style="font-size: 10px;
+                            font-weight: bold;
+                            color: white;
+                            text-align: center;
+                            margin-top: -20px;
+                            text-shadow: 1px 1px 2px black;">
+                    P4
+                </div>
+            `,
+                className: "empty"
+            });
+
+
+                marker_xpa5znl8idwfr2dt39dsx4zfzdml5r6x.setIcon(div_icon_3abp09xutvg8i2lwn9yn5b6fha1i5dhe);
+
+
+            var marker_8xjry0k6a9yq81a1vcl0sa3zi3f7gn83 = L.marker(
+                [32.8727333333333, -97.0849305555556],
+                {}
+            ).addTo(map);
+
+
+            var icon_ixycc2kab8hu2ihoq6ann36rgjx5v2i6 = L.AwesomeMarkers.icon(
+                {
+                    markerColor: "white",
+                    iconColor: "#A23B72",
+                    icon: "star",
+                    prefix: "fa",
+                    extraClasses: "fa-rotate-0"
+                }
+            );
+
+
+        var popup_m01mq02npxwf6eu7tqvi2rc6p2wuig1o = L.popup({
+            maxWidth: 350
+        });
+
+
+
+                var html_u4q6txd6056ynrn6ae6ig01z8h880pag = $(`<div id="html_u4q6txd6056ynrn6ae6ig01z8h880pag" style="width: 100.0%; height: 100.0%;">
+        <div style="width: 300px; font-family: Arial, sans-serif;">
+            <h4 style="margin: 0 0 10px 0; color: #2E86AB;">Palisades at Bear Creek</h4>
+            <p style="margin: 5px 0;"><strong>200 Bear Creek Drive</strong></p>
+            <p style="margin: 5px 0; font-size: 12px;">Euless, TX 76039</p>
+            <hr style="margin: 10px 0;">
+            <p style="margin: 5px 0; font-size: 11px;">
+                📅 October 29, 2025 (Wednesday)<br>
+                📁 26 files (25 photos, 1 videos)
+            </p>
+            <a href="https://www.google.com/maps?q=32.8727333333333,-97.0849305555556" target="_blank" style="font-size: 11px; color: #2E86AB;">
+                📍 View on Google Maps
+            </a>
+            
+            <div class="drive-buttons">
+                <a href="https://drive.google.com/open?id=1afIB2P_Zt0vYla0QuSCkSSxnxOO5_Y2l&usp=drive_copy" target="_blank" class="drive-btn">
+                    📁 Open Folder
+                </a>
+                <button onclick="openGallery('1afIB2P_Zt0vYla0QuSCkSSxnxOO5_Y2l', 'Palisades at Bear Creek')" class="drive-btn drive-btn-gallery">
+                    🖼️ View Gallery
+                </button>
+            </div>
+        
+        </div>
+    </div>`)[0];
+                popup_m01mq02npxwf6eu7tqvi2rc6p2wuig1o.setContent(html_u4q6txd6056ynrn6ae6ig01z8h880pag);
+
+
+
+        marker_8xjry0k6a9yq81a1vcl0sa3zi3f7gn83.bindPopup(popup_m01mq02npxwf6eu7tqvi2rc6p2wuig1o)
+        ;
+
+
+
+
+            marker_8xjry0k6a9yq81a1vcl0sa3zi3f7gn83.bindTooltip(
+                `<div>
+                     Palisades at Bear Creek: 200 Bear Creek Drive
+                 </div>`,
+                {
+                    sticky: true
+                }
+            );
+
+
+                marker_8xjry0k6a9yq81a1vcl0sa3zi3f7gn83.setIcon(icon_ixycc2kab8hu2ihoq6ann36rgjx5v2i6);
+
+
+            var circle_marker_51j2mj4nzx45d9enp9lv7rljb47zc5o0 = L.circleMarker(
+                [32.8727333333333, -97.0849305555556],
+                {"bubblingMouseEvents": true, "color": "#A23B72", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#A23B72", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
+            ).addTo(map);
+
+
+
+
+            var marker_pjsuc0km678d3lkc886miuymoc4tfgs2 = L.marker(
+                [32.8727333333333, -97.0849305555556],
+                {"interactive": false}
+            ).addTo(map);
+
+
+            var div_icon_rhmhq4anetlgcdj5m2xbx6utwkw65g9k = L.divIcon({
+                html: `
+                <div style="font-size: 10px;
+                            font-weight: bold;
+                            color: white;
+                            text-align: center;
+                            margin-top: -20px;
+                            text-shadow: 1px 1px 2px black;">
+                    P5
+                </div>
+            `,
+                className: "empty"
+            });
+
+
+                marker_pjsuc0km678d3lkc886miuymoc4tfgs2.setIcon(div_icon_rhmhq4anetlgcdj5m2xbx6utwkw65g9k);
+
+
+            var marker_adqwf89x1dvtbtp2brqnfq4yt8mml42m = L.marker(
+                [32.8527611111111, -97.0765388888889],
+                {}
+            ).addTo(map);
+
+
+            var icon_qncfj4owudjsntihukfehvhop5zjr8w2 = L.AwesomeMarkers.icon(
+                {
+                    markerColor: "white",
+                    iconColor: "#A23B72",
+                    icon: "star",
+                    prefix: "fa",
+                    extraClasses: "fa-rotate-0"
+                }
+            );
+
+
+        var popup_cbo5hbifa969kxl4xdk004o47w9w7yyz = L.popup({
+            maxWidth: 350
+        });
+
+
+
+                var html_5dvw6fwt7mmj37taar8k3z8dee88qniq = $(`<div id="html_5dvw6fwt7mmj37taar8k3z8dee88qniq" style="width: 100.0%; height: 100.0%;">
+        <div style="width: 300px; font-family: Arial, sans-serif;">
+            <h4 style="margin: 0 0 10px 0; color: #2E86AB;">Park Place</h4>
+            <p style="margin: 5px 0;"><strong>1124 Park Place</strong></p>
+            <p style="margin: 5px 0; font-size: 12px;">Euless, TX 76039</p>
+            <hr style="margin: 10px 0;">
+            <p style="margin: 5px 0; font-size: 11px;">
+                📅 October 29, 2025 (Wednesday)<br>
+                📁 5 files (2 photos, 3 videos)
+            </p>
+            <a href="https://www.google.com/maps?q=32.8527611111111,-97.0765388888889" target="_blank" style="font-size: 11px; color: #2E86AB;">
+                📍 View on Google Maps
+            </a>
+            
+            <div class="drive-buttons">
+                <a href="https://drive.google.com/open?id=1EbTYzbG5sYaaosCHSLAYa4sRN-Q5ODUM&usp=drive_copy" target="_blank" class="drive-btn">
+                    📁 Open Folder
+                </a>
+                <button onclick="openGallery('1EbTYzbG5sYaaosCHSLAYa4sRN-Q5ODUM', 'Park Place')" class="drive-btn drive-btn-gallery">
+                    🖼️ View Gallery
+                </button>
+            </div>
+        
+        </div>
+    </div>`)[0];
+                popup_cbo5hbifa969kxl4xdk004o47w9w7yyz.setContent(html_5dvw6fwt7mmj37taar8k3z8dee88qniq);
+
+
+
+        marker_adqwf89x1dvtbtp2brqnfq4yt8mml42m.bindPopup(popup_cbo5hbifa969kxl4xdk004o47w9w7yyz)
+        ;
+
+
+
+
+            marker_adqwf89x1dvtbtp2brqnfq4yt8mml42m.bindTooltip(
+                `<div>
+                     Park Place: 1124 Park Place
+                 </div>`,
+                {
+                    sticky: true
+                }
+            );
+
+
+                marker_adqwf89x1dvtbtp2brqnfq4yt8mml42m.setIcon(icon_qncfj4owudjsntihukfehvhop5zjr8w2);
+
+
+            var circle_marker_an43smxhaygj0b6hw4lheuet3df5f9ka = L.circleMarker(
+                [32.8527611111111, -97.0765388888889],
+                {"bubblingMouseEvents": true, "color": "#A23B72", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#A23B72", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
+            ).addTo(map);
+
+
+
+
+            var marker_kua6c35mo0m1bxwn8neel6jygkpyw8vf = L.marker(
+                [32.8527611111111, -97.0765388888889],
+                {"interactive": false}
+            ).addTo(map);
+
+
+            var div_icon_xqjzndsuury12ngajaqgjpcs32k5yn1h = L.divIcon({
+                html: `
+                <div style="font-size: 10px;
+                            font-weight: bold;
+                            color: white;
+                            text-align: center;
+                            margin-top: -20px;
+                            text-shadow: 1px 1px 2px black;">
+                    P6
+                </div>
+            `,
+                className: "empty"
+            });
+
+
+                marker_kua6c35mo0m1bxwn8neel6jygkpyw8vf.setIcon(div_icon_xqjzndsuury12ngajaqgjpcs32k5yn1h);
+
+
+            var marker_bobbrunvvje60b4i77atcpbq0m1jpdkp = L.marker(
+                [32.8532555555556, -97.0859388888889],
+                {}
+            ).addTo(map);
+
+
+            var icon_cgd7fibehfxj3cuo6zvlrnkoapgvkshc = L.AwesomeMarkers.icon(
+                {
+                    markerColor: "white",
+                    iconColor: "#2E86AB",
+                    icon: "star",
+                    prefix: "fa",
+                    extraClasses: "fa-rotate-0"
+                }
+            );
+
+
+        var popup_mjuibg6an7toizsspx8du4078crfj1px = L.popup({
+            maxWidth: 350
+        });
+
+
+
+                var html_q5pzzcbcktuoxk1gujrrydfkn4e9fknq = $(`<div id="html_q5pzzcbcktuoxk1gujrrydfkn4e9fknq" style="width: 100.0%; height: 100.0%;">
+        <div style="width: 300px; font-family: Arial, sans-serif;">
+            <h4 style="margin: 0 0 10px 0; color: #2E86AB;">The Pointe At Fair Oaks</h4>
+            <p style="margin: 5px 0;"><strong>301 Fair Oaks Boulevard</strong></p>
+            <p style="margin: 5px 0; font-size: 12px;">Euless, TX 76039</p>
+            <hr style="margin: 10px 0;">
+            <p style="margin: 5px 0; font-size: 11px;">
+                📅 October 29, 2025 (Wednesday)<br>
+                📁 11 files (11 photos, 0 videos)
+            </p>
+            <a href="https://www.google.com/maps?q=32.8532555555556,-97.0859388888889" target="_blank" style="font-size: 11px; color: #2E86AB;">
+                📍 View on Google Maps
+            </a>
+            
+            <div class="drive-buttons">
+                <a href="https://drive.google.com/open?id=17AdhOrAnX0G_KKXoZ1_KJ_Maj7ig102O&usp=drive_copy" target="_blank" class="drive-btn">
+                    📁 Open Folder
+                </a>
+                <button onclick="openGallery('17AdhOrAnX0G_KKXoZ1_KJ_Maj7ig102O', 'The Pointe At Fair Oaks')" class="drive-btn drive-btn-gallery">
+                    🖼️ View Gallery
+                </button>
+            </div>
+        
+        </div>
+    </div>`)[0];
+                popup_mjuibg6an7toizsspx8du4078crfj1px.setContent(html_q5pzzcbcktuoxk1gujrrydfkn4e9fknq);
+
+
+
+        marker_bobbrunvvje60b4i77atcpbq0m1jpdkp.bindPopup(popup_mjuibg6an7toizsspx8du4078crfj1px)
+        ;
+
+
+
+
+            marker_bobbrunvvje60b4i77atcpbq0m1jpdkp.bindTooltip(
+                `<div>
+                     The Pointe At Fair Oaks: 301 Fair Oaks Boulevard
+                 </div>`,
+                {
+                    sticky: true
+                }
+            );
+
+
+                marker_bobbrunvvje60b4i77atcpbq0m1jpdkp.setIcon(icon_cgd7fibehfxj3cuo6zvlrnkoapgvkshc);
+
+
+            var circle_marker_a08dx2mzsw0vb17bp7xuzu8trwf2pydn = L.circleMarker(
+                [32.8532555555556, -97.0859388888889],
+                {"bubblingMouseEvents": true, "color": "#2E86AB", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#2E86AB", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
+            ).addTo(map);
+
+
+
+
+            var marker_a2d4fo99r59k5uy0owivwvjpqtyt0qke = L.marker(
+                [32.8532555555556, -97.0859388888889],
+                {"interactive": false}
+            ).addTo(map);
+
+
+            var div_icon_ijflj6bbvkr7jhx40ynyja4uj50dsyrp = L.divIcon({
+                html: `
+                <div style="font-size: 10px;
+                            font-weight: bold;
+                            color: white;
+                            text-align: center;
+                            margin-top: -20px;
+                            text-shadow: 1px 1px 2px black;">
+                    P7
+                </div>
+            `,
+                className: "empty"
+            });
+
+
+                marker_a2d4fo99r59k5uy0owivwvjpqtyt0qke.setIcon(div_icon_ijflj6bbvkr7jhx40ynyja4uj50dsyrp);
+
+
+            var marker_gmfunm0u28erjnhvib4f2p90sk56iojt = L.marker(
+                [32.8619694444444, -97.0991527777778],
+                {}
+            ).addTo(map);
+
+
+            var icon_awz0xnqu3o2cmwa3ns5kdpc2aflhx9o9 = L.AwesomeMarkers.icon(
+                {
+                    markerColor: "white",
+                    iconColor: "#A23B72",
+                    icon: "star",
+                    prefix: "fa",
+                    extraClasses: "fa-rotate-0"
+                }
+            );
+
+
+        var popup_6w7d8a5xa7odctd69m13baqub2qnqv3h = L.popup({
+            maxWidth: 350
+        });
+
+
+
+                var html_g6ydgdace0w0en9beud122jlcdh4l4o5 = $(`<div id="html_g6ydgdace0w0en9beud122jlcdh4l4o5" style="width: 100.0%; height: 100.0%;">
+        <div style="width: 300px; font-family: Arial, sans-serif;">
+            <h4 style="margin: 0 0 10px 0; color: #2E86AB;">Willow Ridge</h4>
+            <p style="margin: 5px 0;"><strong>1050 West Ash Lane</strong></p>
+            <p style="margin: 5px 0; font-size: 12px;">Euless, TX 76039</p>
+            <hr style="margin: 10px 0;">
+            <p style="margin: 5px 0; font-size: 11px;">
+                📅 October 30, 2025 (Thursday)<br>
+                📁 28 files (24 photos, 4 videos)
+            </p>
+            <a href="https://www.google.com/maps?q=32.8619694444444,-97.0991527777778" target="_blank" style="font-size: 11px; color: #2E86AB;">
+                📍 View on Google Maps
+            </a>
+            
+            <div class="drive-buttons">
+                <a href="https://drive.google.com/open?id=1sqTv5MyiYUR2o9FXXmK00znpQLmfziSD&usp=drive_copy" target="_blank" class="drive-btn">
+                    📁 Open Folder
+                </a>
+                <button onclick="openGallery('1sqTv5MyiYUR2o9FXXmK00znpQLmfziSD', 'Willow Ridge')" class="drive-btn drive-btn-gallery">
+                    🖼️ View Gallery
+                </button>
+            </div>
+        
+        </div>
+    </div>`)[0];
+                popup_6w7d8a5xa7odctd69m13baqub2qnqv3h.setContent(html_g6ydgdace0w0en9beud122jlcdh4l4o5);
+
+
+
+        marker_gmfunm0u28erjnhvib4f2p90sk56iojt.bindPopup(popup_6w7d8a5xa7odctd69m13baqub2qnqv3h)
+        ;
+
+
+
+
+            marker_gmfunm0u28erjnhvib4f2p90sk56iojt.bindTooltip(
+                `<div>
+                     Willow Ridge: 1050 West Ash Lane
+                 </div>`,
+                {
+                    sticky: true
+                }
+            );
+
+
+                marker_gmfunm0u28erjnhvib4f2p90sk56iojt.setIcon(icon_awz0xnqu3o2cmwa3ns5kdpc2aflhx9o9);
+
+
+            var circle_marker_ivc6n9sx8mtxx6xkh2h3lql6sd9r82pu = L.circleMarker(
+                [32.8619694444444, -97.0991527777778],
+                {"bubblingMouseEvents": true, "color": "#A23B72", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#A23B72", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
+            ).addTo(map);
+
+
+
+
+            var marker_h0hjjh2qjrzzp4m7ty93cotbv9766rd6 = L.marker(
+                [32.8619694444444, -97.0991527777778],
+                {"interactive": false}
+            ).addTo(map);
+
+
+            var div_icon_h4zennounwz1psnvf3207pgjaxs82ple = L.divIcon({
+                html: `
+                <div style="font-size: 10px;
+                            font-weight: bold;
+                            color: white;
+                            text-align: center;
+                            margin-top: -20px;
+                            text-shadow: 1px 1px 2px black;">
+                    P8
+                </div>
+            `,
+                className: "empty"
+            });
+
+
+                marker_h0hjjh2qjrzzp4m7ty93cotbv9766rd6.setIcon(div_icon_h4zennounwz1psnvf3207pgjaxs82ple);
+
+
+            L.control.fullscreen({
+                position: 'topleft',
+                title: 'Enter fullscreen mode',
+                titleCancel: 'Exit fullscreen mode',
+                forceSeparateButton: true
+            }).addTo(map);
+
+</script>
+</html>

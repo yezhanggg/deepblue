@@ -6,7 +6,7 @@
     <title>Deepblue Capital Partners</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -15,122 +15,201 @@
         }
 
         body {
-            font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(180deg, #f7f9fe 0%, #f5f7fc 55%, #eef2fb 100%);
-            color: #0b1220;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #b5a8c4 0%, #9d8faa 50%, #a89bb0 100%);
+            color: #ffffff;
             line-height: 1.6;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 15% 30%, rgba(186, 175, 200, 0.4) 0%, transparent 40%),
+                radial-gradient(circle at 85% 70%, rgba(168, 155, 176, 0.3) 0%, transparent 40%);
+            pointer-events: none;
+            z-index: 0;
         }
 
         .hero {
             position: relative;
-            padding: 160px 40px 100px;
-            max-width: 1080px;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 24px;
+            padding: 80px 40px 60px;
+            max-width: 1200px;
             margin: 0 auto;
-            text-align: center;
+            width: 100%;
+        }
+
+        .brand-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 20px;
+            padding: 20px 32px;
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .brand-container:hover {
+            background: rgba(255, 255, 255, 0.22);
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow:
+                0 12px 48px rgba(0, 0, 0, 0.12),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            transform: translateY(-4px);
         }
 
         .brand-mark {
-            position: absolute;
-            top: 48px;
-            left: 48px;
-            width: clamp(86px, 9vw, 108px);
+            flex-shrink: 0;
+            width: 56px;
             height: auto;
-            border-radius: 24px;
-            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.18);
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .brand-container:hover .brand-mark {
+            transform: scale(1.05) rotate(2deg);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
         }
 
         .hero-title {
+            font-family: 'Inter', sans-serif;
+            font-size: clamp(24px, 4vw, 36px);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #ffffff;
+            margin: 0;
+            white-space: nowrap;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
-            display: inline-block;
-            font-family: 'Sora', 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            font-size: clamp(52px, 7vw, 76px);
-            font-weight: 600;
-            letter-spacing: -0.035em;
-            color: #0b1428;
-            padding: 0 48px;
         }
 
-        .hero-title::after {
-            content: '';
-            position: absolute;
-            right: -26px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: clamp(110px, 14vw, 180px);
-            height: clamp(28px, 5vw, 46px);
-            background: linear-gradient(90deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 100%);
-            filter: blur(14px);
-            opacity: 0.9;
-            z-index: -1;
+        .brand-container:hover .hero-title {
+            letter-spacing: 0.01em;
+            text-shadow: 0 4px 20px rgba(255, 255, 255, 0.3);
         }
 
         main {
             flex: 1;
             width: 100%;
+            position: relative;
+            z-index: 1;
         }
 
         .content {
-            max-width: 1020px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 0 40px 140px;
+            padding: 40px 40px 80px;
         }
 
         .section-title {
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.28em;
-            color: #8b97b0;
-            margin-bottom: 36px;
+            letter-spacing: 0.1em;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 24px;
+            padding: 0 8px;
         }
 
         .projects {
-            display: flex;
-            flex-direction: column;
-            gap: 32px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 24px;
         }
 
         .project-card {
-            width: min(100%, 440px);
-            background: #ffffff;
-            border-radius: 28px;
-            padding: 42px 44px;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border-radius: 24px;
+            padding: 32px;
             text-decoration: none;
             color: inherit;
-            box-shadow: 0 30px 70px rgba(15, 23, 42, 0.12);
-            border: 1px solid rgba(148, 163, 184, 0.24);
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.3);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .project-card:hover::before {
+            transform: scaleX(1);
         }
 
         .project-card:hover {
-            transform: translate3d(0, -6px, 0);
-            box-shadow: 0 36px 80px rgba(37, 99, 235, 0.18);
+            transform: translateY(-8px);
+            background: rgba(255, 255, 255, 0.18);
+            box-shadow:
+                0 12px 48px rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.35);
         }
 
         .project-tag {
+            display: inline-block;
             font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.2em;
-            color: #2951ff;
-            margin-bottom: 18px;
+            letter-spacing: 0.1em;
+            color: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.15);
+            padding: 6px 12px;
+            border-radius: 10px;
+            margin-bottom: 16px;
         }
 
         .project-card h2 {
-            font-size: 24px;
-            font-weight: 600;
+            font-size: 22px;
+            font-weight: 700;
             letter-spacing: -0.01em;
-            color: #0d152e;
-            margin-bottom: 12px;
+            color: #ffffff;
+            margin-bottom: 8px;
+            line-height: 1.3;
         }
 
         .project-card p {
-            color: #64708b;
-            font-size: 16px;
-            margin-bottom: 24px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 15px;
+            margin-bottom: 20px;
+            font-weight: 500;
         }
 
         .project-link {
@@ -139,71 +218,94 @@
             gap: 8px;
             font-size: 14px;
             font-weight: 600;
-            color: #3061ff;
+            color: rgba(255, 255, 255, 0.95);
+            transition: gap 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .project-card:hover .project-link {
             gap: 12px;
         }
 
+        .project-link::after {
+            content: '→';
+            font-size: 16px;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .project-card:hover .project-link::after {
+            transform: translateX(4px);
+        }
+
         footer {
-            border-top: 1px solid rgba(148, 163, 184, 0.32);
-            padding: 36px 40px;
+            position: relative;
+            z-index: 1;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 32px 40px;
             text-align: center;
             font-size: 14px;
-            color: #8691a7;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
         }
 
         @media (max-width: 900px) {
             .hero {
-                padding: 150px 32px 90px;
+                padding: 60px 32px 50px;
             }
 
-            .brand-mark {
-                top: 36px;
-                left: 32px;
-                width: clamp(74px, 12vw, 96px);
+            .brand-container {
+                flex-direction: column;
+                padding: 24px;
+                gap: 16px;
             }
 
             .content {
-                padding: 0 32px 110px;
+                padding: 32px 32px 60px;
+            }
+
+            .projects {
+                grid-template-columns: 1fr;
             }
         }
 
         @media (max-width: 680px) {
             .hero {
-                padding: 140px 24px 90px;
+                padding: 50px 24px 40px;
             }
 
             .brand-mark {
-                position: static;
-                margin: 0 auto 32px;
-                display: block;
+                width: 48px;
             }
 
             .hero-title {
-                padding: 0;
-            }
-
-            .hero-title::after {
-                right: -10px;
-                width: clamp(90px, 36vw, 140px);
+                font-size: clamp(20px, 6vw, 28px);
+                text-align: center;
             }
 
             .content {
-                padding: 0 24px 90px;
+                padding: 24px 24px 50px;
             }
 
             .project-card {
-                width: 100%;
+                padding: 28px;
+            }
+
+            footer {
+                padding: 28px 24px;
+                font-size: 13px;
             }
         }
+
     </style>
 </head>
 <body>
     <header class="hero">
-        <img src="image 1.png" alt="Deepblue Capital Partners emblem" class="brand-mark">
-        <h1 class="hero-title">Deepblue Capital Partners</h1>
+        <div class="brand-container">
+            <img src="image 1.png" alt="Deepblue Capital Partners emblem" class="brand-mark">
+            <h1 class="hero-title">Deepblue Capital Partners</h1>
+        </div>
     </header>
 
     <main>
@@ -215,10 +317,7 @@
                     <div class="project-tag">Tour</div>
                     <h2>Willow Ridge Comps Tour</h2>
                     <p>DFW &ndash; 10.29.25 &ndash; 10.30.25</p>
-                    <span class="project-link">
-                        View Tour
-                        <span aria-hidden="true">&rarr;</span>
-                    </span>
+                    <span class="project-link">View Tour</span>
                 </a>
 
                 <!-- Add more property tours here -->

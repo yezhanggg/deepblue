@@ -17,7 +17,15 @@
 
             <meta name="viewport" content="width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <link rel="preconnect" href="https://fonts.googleapis.com">
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
             <style>
+                body {
+                    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                    background: linear-gradient(135deg, #b5a8c4 0%, #9d8faa 50%, #a89bb0 100%);
+                }
+
                 #map {
                     position: relative;
                     width: 100.0%;
@@ -25,7 +33,10 @@
                     left: 0.0%;
                     top: 0.0%;
                 }
-                .leaflet-container { font-size: 1rem; }
+                .leaflet-container {
+                    font-size: 1rem;
+                    font-family: 'Inter', sans-serif;
+                }
 
                 /* Marker styles for better visibility */
                 .awesome-marker {
@@ -43,19 +54,29 @@
                     stroke-width: 3 !important;
                 }
 
-                /* Label text with better visibility */
+                /* Label text with better visibility - integrated into marker */
                 .empty div {
-                    text-shadow:
-                        -1px -1px 0 #000,
-                        1px -1px 0 #000,
-                        -1px 1px 0 #000,
-                        1px 1px 0 #000,
-                        0 0 5px rgba(0,0,0,0.8) !important;
-                    font-weight: 900 !important;
-                    font-size: 12px !important;
+                    position: absolute !important;
+                    top: 8px !important;
+                    left: 50% !important;
+                    transform: translateX(-50%) !important;
+                    background: white !important;
+                    color: #000000 !important;
+                    width: 22px !important;
+                    height: 22px !important;
+                    border-radius: 50% !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    font-weight: 800 !important;
+                    font-size: 13px !important;
+                    font-family: 'Inter', sans-serif !important;
+                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4) !important;
+                    border: 2px solid #000000 !important;
+                    z-index: 1000 !important;
                 }
 
-                /* Modal styles */
+                /* Modal styles with glassmorphism */
                 .gallery-modal {
                     display: none;
                     position: fixed;
@@ -64,7 +85,9 @@
                     top: 0;
                     width: 100%;
                     height: 100%;
-                    background-color: rgba(0,0,0,0.9);
+                    background-color: rgba(157, 143, 170, 0.7);
+                    backdrop-filter: blur(12px);
+                    -webkit-backdrop-filter: blur(12px);
                 }
 
                 .gallery-modal-content {
@@ -72,36 +95,50 @@
                     margin: 2% auto;
                     width: 90%;
                     height: 90%;
-                    background-color: white;
-                    border-radius: 8px;
+                    background: rgba(255, 255, 255, 0.95);
+                    backdrop-filter: blur(20px);
+                    -webkit-backdrop-filter: blur(20px);
+                    border-radius: 24px;
                     overflow: hidden;
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
                 }
 
                 .gallery-modal-header {
-                    background-color: #2E86AB;
-                    color: white;
-                    padding: 15px 20px;
+                    background: rgba(255, 255, 255, 0.3);
+                    backdrop-filter: blur(40px);
+                    -webkit-backdrop-filter: blur(40px);
+                    color: #000000;
+                    padding: 20px 24px;
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
                 }
 
                 .gallery-modal-close {
-                    color: white;
-                    font-size: 28px;
-                    font-weight: bold;
+                    color: #000000;
+                    font-size: 32px;
+                    font-weight: 300;
                     cursor: pointer;
                     background: none;
                     border: none;
+                    transition: all 0.3s ease;
+                    line-height: 1;
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 12px;
                 }
 
                 .gallery-modal-close:hover {
-                    color: #ccc;
+                    background: rgba(255, 255, 255, 0.25);
+                    transform: rotate(90deg);
                 }
 
                 .gallery-modal-body {
                     width: 100%;
-                    height: calc(100% - 60px);
+                    height: calc(100% - 80px);
+                    background: white;
                 }
 
                 .gallery-modal iframe {
@@ -112,39 +149,217 @@
 
                 .drive-buttons {
                     display: flex;
-                    gap: 10px;
-                    margin-top: 10px;
+                    gap: 8px;
+                    margin-top: 12px;
+                    flex-wrap: wrap;
                 }
 
                 .drive-btn {
                     display: inline-block;
-                    padding: 8px 15px;
-                    background-color: white;
-                    color: #2E86AB;
+                    padding: 10px 16px;
+                    background: rgba(255, 255, 255, 0.9);
+                    color: #3b82f6;
                     text-decoration: none;
-                    border-radius: 5px;
+                    border-radius: 12px;
                     font-size: 12px;
                     cursor: pointer;
-                    border: 2px solid #2E86AB;
-                    transition: all 0.3s;
+                    border: 1px solid rgba(59, 130, 246, 0.3);
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                     font-weight: 600;
+                    font-family: 'Inter', sans-serif;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
                 }
 
                 .drive-btn:hover {
-                    background-color: #2E86AB;
+                    background: #3b82f6;
                     color: white;
                     text-decoration: none;
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
                 }
 
                 .drive-btn-gallery {
-                    background-color: white;
-                    color: #A23B72;
-                    border-color: #A23B72;
+                    background: rgba(255, 255, 255, 0.9);
+                    color: #a855f7;
+                    border-color: rgba(168, 85, 247, 0.3);
                 }
 
                 .drive-btn-gallery:hover {
-                    background-color: #A23B72;
+                    background: #a855f7;
                     color: white;
+                    box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
+                }
+
+                /* Back button hover effect */
+                a[href="../"]:hover {
+                    background: rgba(255, 255, 255, 0.5) !important;
+                    border-color: rgba(255, 255, 255, 0.6) !important;
+                    transform: translateY(-2px) scale(1.1) !important;
+                    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
+                    animation: none !important;
+                }
+
+                /* Popup styles */
+                .leaflet-popup-content-wrapper {
+                    background: rgba(255, 255, 255, 0.3);
+                    backdrop-filter: blur(40px);
+                    -webkit-backdrop-filter: blur(40px);
+                    border-radius: 20px;
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                    font-family: 'Inter', sans-serif;
+                }
+
+                .leaflet-popup-content {
+                    margin: 20px 22px;
+                    font-family: 'Inter', sans-serif;
+                }
+
+                .leaflet-popup-tip {
+                    background: rgba(255, 255, 255, 0.3);
+                    backdrop-filter: blur(40px);
+                    -webkit-backdrop-filter: blur(40px);
+                }
+
+                .leaflet-popup-close-button {
+                    color: #000000 !important;
+                    font-size: 24px !important;
+                    font-weight: 300 !important;
+                    padding: 8px 12px !important;
+                }
+
+                /* Back button pulse animation */
+                @keyframes pulse {
+                    0%, 100% {
+                        transform: scale(1);
+                        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+                    }
+                    50% {
+                        transform: scale(1.08);
+                        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+                    }
+                }
+
+                a[href="../"] {
+                    animation: pulse 2s ease-in-out infinite;
+                }
+
+                /* Dropdown styles */
+                .property-list {
+                    max-height: 0;
+                    overflow: hidden;
+                    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                    margin-top: 0;
+                }
+
+                .property-list.expanded {
+                    max-height: 500px;
+                    margin-top: 16px;
+                    overflow-y: auto;
+                }
+
+                .property-list::-webkit-scrollbar {
+                    width: 6px;
+                }
+
+                .property-list::-webkit-scrollbar-track {
+                    background: rgba(0, 0, 0, 0.05);
+                    border-radius: 10px;
+                }
+
+                .property-list::-webkit-scrollbar-thumb {
+                    background: rgba(0, 0, 0, 0.2);
+                    border-radius: 10px;
+                }
+
+                .property-list::-webkit-scrollbar-thumb:hover {
+                    background: rgba(0, 0, 0, 0.3);
+                }
+
+                .property-item {
+                    padding: 12px 14px;
+                    margin: 8px 0;
+                    background: rgba(255, 255, 255, 0.15);
+                    border-radius: 12px;
+                    font-size: 13px;
+                    color: #000000;
+                    cursor: pointer;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    border: 1px solid rgba(0, 0, 0, 0.1);
+                    position: relative;
+                    overflow: hidden;
+                }
+
+                .property-item::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: -100%;
+                    width: 100%;
+                    height: 100%;
+                    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+                    transition: left 0.5s ease;
+                }
+
+                .property-item:hover::before {
+                    left: 100%;
+                }
+
+                .property-item:hover {
+                    background: rgba(255, 255, 255, 0.35);
+                    transform: translateX(8px) translateY(-2px);
+                    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+                    border-color: rgba(255, 255, 255, 0.3);
+                }
+
+                .property-item:active {
+                    transform: translateX(6px) translateY(0px);
+                    transition: all 0.1s ease;
+                }
+
+                .property-number {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 24px;
+                    height: 24px;
+                    background: white;
+                    color: #000000;
+                    border-radius: 50%;
+                    font-weight: 800;
+                    font-size: 13px;
+                    margin-right: 10px;
+                    border: 2px solid #000000;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                }
+
+                .property-item:hover .property-number {
+                    transform: scale(1.15) rotate(360deg);
+                    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+                    background: #000000;
+                    color: white;
+                }
+
+                .toggle-arrow {
+                    display: inline-block;
+                    margin-left: 8px;
+                    transition: transform 0.3s ease;
+                    font-size: 12px;
+                    font-weight: 700;
+                }
+
+                .toggle-arrow.expanded {
+                    transform: rotate(90deg);
+                }
+
+                .header-clickable {
+                    cursor: pointer;
+                    user-select: none;
+                }
+
+                .header-clickable:hover {
+                    opacity: 0.8;
                 }
             </style>
 
@@ -180,7 +395,7 @@
     <div id="galleryModal" class="gallery-modal">
         <div class="gallery-modal-content">
             <div class="gallery-modal-header">
-                <h3 id="modalTitle" style="margin: 0;">Property Photos</h3>
+                <h3 id="modalTitle" style="margin: 0; font-weight: 700;">Property Photos</h3>
                 <button class="gallery-modal-close" onclick="closeGallery()">&times;</button>
             </div>
             <div class="gallery-modal-body">
@@ -189,42 +404,99 @@
         </div>
     </div>
 
-    <div style="position: fixed;
-                top: 10px;
+    <div id="headerBox" style="position: fixed;
+                top: 16px;
                 left: 50px;
-                width: 550px;
-                height: 90px;
-                background-color: white;
-                border: 2px solid #2E86AB;
+                width: 540px;
+                background: rgba(255, 255, 255, 0.25);
+                backdrop-filter: blur(40px);
+                -webkit-backdrop-filter: blur(40px);
+                border: 1px solid rgba(255, 255, 255, 0.3);
                 z-index: 9999;
-                font-size: 16px;
-                padding: 10px;
-                border-radius: 5px;
-                box-shadow: 0 0 10px rgba(0,0,0,0.3);">
-        <h3 style="margin: 0; color: #2E86AB;">Deepblue Capital Partners</h3>
-        <h4 style="margin: 5px 0; color: #A23B72;">Willow Ridge Comps Tour (10.29.25 - 10.30.25)</h4>
-        <p style="margin: 5px 0; font-size: 12px; color: #666;">
-            Total Properties: 8
-        </p>
+                padding: 20px 24px;
+                border-radius: 20px;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+                font-family: 'Inter', sans-serif;">
+        <div class="header-clickable" onclick="togglePropertyList()">
+            <h3 style="margin: 0 0 8px 0; color: #000000; font-size: 20px; font-weight: 700; letter-spacing: -0.01em;">Deepblue Capital Partners</h3>
+            <h4 style="margin: 0 0 8px 0; color: #000000; font-size: 16px; font-weight: 600;">Willow Ridge Comps Tour</h4>
+            <p style="margin: 0; font-size: 13px; color: #000000; font-weight: 600;">
+                📅 10.29.25 - 10.30.25 · 📍 8 Properties
+                <span class="toggle-arrow" id="toggleArrow">→</span>
+            </p>
+        </div>
+        <div class="property-list" id="propertyList">
+            <div class="property-item" onclick="focusMarker(1)">
+                <span class="property-number">1</span>3001 Crystal Springs
+            </div>
+            <div class="property-item" onclick="focusMarker(2)">
+                <span class="property-number">2</span>Bedford Hills
+            </div>
+            <div class="property-item" onclick="focusMarker(3)">
+                <span class="property-number">3</span>Harwood Hills
+            </div>
+            <div class="property-item" onclick="focusMarker(4)">
+                <span class="property-number">4</span>Huntington Glen
+            </div>
+            <div class="property-item" onclick="focusMarker(5)">
+                <span class="property-number">5</span>Palisades at Bear Creek
+            </div>
+            <div class="property-item" onclick="focusMarker(6)">
+                <span class="property-number">6</span>Park Place
+            </div>
+            <div class="property-item" onclick="focusMarker(7)">
+                <span class="property-number">7</span>The Pointe At Fair Oaks
+            </div>
+            <div class="property-item" onclick="focusMarker(8)">
+                <span class="property-number">8</span>Willow Ridge
+            </div>
+        </div>
     </div>
 
+    <!-- Back to Home Button -->
+    <a href="../" style="position: fixed;
+                top: 16px;
+                right: 16px;
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 52px;
+                height: 52px;
+                background: rgba(255, 255, 255, 0.35);
+                backdrop-filter: blur(40px);
+                -webkit-backdrop-filter: blur(40px);
+                border: 2px solid rgba(255, 255, 255, 0.4);
+                border-radius: 50%;
+                color: #000000;
+                text-decoration: none;
+                font-size: 22px;
+                font-weight: 600;
+                font-family: 'Inter', sans-serif;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+                cursor: pointer;">
+        ←
+    </a>
 
     <div style="position: fixed;
-                bottom: 50px;
-                left: 50px;
+                bottom: 20px;
+                left: 20px;
                 width: 200px;
-                background-color: white;
-                border: 2px solid #2E86AB;
+                background: rgba(255, 255, 255, 0.25);
+                backdrop-filter: blur(40px);
+                -webkit-backdrop-filter: blur(40px);
+                border: 1px solid rgba(255, 255, 255, 0.3);
                 z-index: 9999;
-                font-size: 12px;
-                padding: 10px;
-                border-radius: 5px;
-                box-shadow: 0 0 10px rgba(0,0,0,0.3);">
-        <h4 style="margin: 0 0 10px 0; color: #2E86AB;">Legend</h4>
-        <p style="margin: 5px 0;">
-            <span style="color: #2E86AB;">●</span> Photos Only<br>
-            <span style="color: #F18F01;">●</span> Videos Only<br>
-            <span style="color: #A23B72;">●</span> Photos + Videos
+                padding: 18px 20px;
+                border-radius: 20px;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+                font-family: 'Inter', sans-serif;">
+        <h4 style="margin: 0 0 12px 0; color: #000000; font-size: 14px; font-weight: 700; letter-spacing: -0.01em;">Legend</h4>
+        <p style="margin: 0; font-size: 13px; color: #000000; line-height: 1.8; font-weight: 600;">
+            <span style="color: #3b82f6; font-size: 16px;">●</span> Photos Only<br>
+            <span style="color: #f59e0b; font-size: 16px;">●</span> Videos Only<br>
+            <span style="color: #a855f7; font-size: 16px;">●</span> Photos + Videos
         </p>
     </div>
 
@@ -259,6 +531,17 @@
             closeGallery();
         }
     }
+
+    // Toggle property list dropdown
+    function togglePropertyList() {
+        const list = document.getElementById('propertyList');
+        const arrow = document.getElementById('toggleArrow');
+        list.classList.toggle('expanded');
+        arrow.classList.toggle('expanded');
+    }
+
+    // Store marker references
+    var markerReferences = {};
 
 
             var map = L.map(
@@ -298,7 +581,7 @@
             var icon_fksd52ypz7uzo3msngxte4ldc7uay1fl = L.AwesomeMarkers.icon(
                 {
                     markerColor: "white",
-                    iconColor: "#A23B72",
+                    iconColor: "#a855f7",
                     icon: "star",
                     prefix: "fa",
                     extraClasses: "fa-rotate-0"
@@ -313,16 +596,16 @@
 
 
                 var html_oy7ee5oxnel88ptf7fq5wf5k8jcdxuna = $(`<div id="html_oy7ee5oxnel88ptf7fq5wf5k8jcdxuna" style="width: 100.0%; height: 100.0%;">
-        <div style="width: 300px; font-family: Arial, sans-serif;">
-            <h4 style="margin: 0 0 10px 0; color: #2E86AB;">3001 Crystal Springs</h4>
-            <p style="margin: 5px 0;"><strong>3001 Crystal Springs Street</strong></p>
-            <p style="margin: 5px 0; font-size: 12px;">Bedford, TX 76021</p>
-            <hr style="margin: 10px 0;">
-            <p style="margin: 5px 0; font-size: 11px;">
+        <div style="width: 300px; font-family: 'Inter', sans-serif;">
+            <h4 style="margin: 0 0 12px 0; color: #000000; font-weight: 700; font-size: 18px;">3001 Crystal Springs</h4>
+            <p style="margin: 5px 0; font-weight: 600; color: #000000;">3001 Crystal Springs Street</p>
+            <p style="margin: 5px 0; font-size: 13px; color: #000000; opacity: 0.7;">Bedford, TX 76021</p>
+            <hr style="margin: 12px 0; border: none; border-top: 1px solid rgba(0,0,0,0.15);">
+            <p style="margin: 8px 0; font-size: 12px; color: #000000; opacity: 0.8; line-height: 1.6;">
                 📅 October 29, 2025 (Wednesday)<br>
                 📁 22 files (21 photos, 1 videos)
             </p>
-            <a href="https://www.google.com/maps?q=32.8550305555556,-97.1120305555555" target="_blank" style="font-size: 11px; color: #2E86AB;">
+            <a href="https://www.google.com/maps?q=32.8550305555556,-97.1120305555555" target="_blank" style="font-size: 12px; color: #3b82f6; font-weight: 600; text-decoration: none;">
                 📍 View on Google Maps
             </a>
             
@@ -362,7 +645,7 @@
 
             var circle_marker_61bpc2k5p8cucwf08r7y1xjju53v8zae = L.circleMarker(
                 [32.8550305555556, -97.1120305555555],
-                {"bubblingMouseEvents": true, "color": "#A23B72", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#A23B72", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
             ).addTo(map);
 
 
@@ -375,21 +658,13 @@
 
 
             var div_icon_uua0zr4ztquslqwjltkkhbggxk0qrcjh = L.divIcon({
-                html: `
-                <div style="font-size: 10px;
-                            font-weight: bold;
-                            color: white;
-                            text-align: center;
-                            margin-top: -20px;
-                            text-shadow: 1px 1px 2px black;">
-                    P1
-                </div>
-            `,
+                html: `<div>1</div>`,
                 className: "empty"
             });
 
 
                 marker_unfsa6nj61vpjlb6b79sfy6an6uaqmen.setIcon(div_icon_uua0zr4ztquslqwjltkkhbggxk0qrcjh);
+                markerReferences[1] = marker_osiszn5f8tnnq5jdnajsaamizx0vcg9f;
 
 
             var marker_h24qptjl28pzvgxq5w6j0rogf14ak8i4 = L.marker(
@@ -401,7 +676,7 @@
             var icon_gmgg2df64lbao09mksu34c7f148e61fd = L.AwesomeMarkers.icon(
                 {
                     markerColor: "white",
-                    iconColor: "#A23B72",
+                    iconColor: "#a855f7",
                     icon: "star",
                     prefix: "fa",
                     extraClasses: "fa-rotate-0"
@@ -416,16 +691,16 @@
 
 
                 var html_aw62uhcpdhc1ucqyoa85wktsris9n47r = $(`<div id="html_aw62uhcpdhc1ucqyoa85wktsris9n47r" style="width: 100.0%; height: 100.0%;">
-        <div style="width: 300px; font-family: Arial, sans-serif;">
-            <h4 style="margin: 0 0 10px 0; color: #2E86AB;">Bedford Hills</h4>
-            <p style="margin: 5px 0;"><strong>3532 Shady Brook Drive</strong></p>
-            <p style="margin: 5px 0; font-size: 12px;">Bedford, TX 76021</p>
-            <hr style="margin: 10px 0;">
-            <p style="margin: 5px 0; font-size: 11px;">
+        <div style="width: 300px; font-family: 'Inter', sans-serif;">
+            <h4 style="margin: 0 0 12px 0; color: #000000; font-weight: 700; font-size: 18px; font-family: 'Inter', sans-serif;">Bedford Hills</h4>
+            <p style="margin: 5px 0; font-weight: 600; color: #000000;"><strong>3532 Shady Brook Drive</strong></p>
+            <p style="margin: 5px 0; font-size: 13px; color: #000000; opacity: 0.7;">Bedford, TX 76021</p>
+            <hr style="margin: 12px 0; border: none; border-top: 1px solid rgba(0,0,0,0.15);">
+            <p style="margin: 8px 0; font-size: 12px; color: #000000; opacity: 0.8; line-height: 1.6;">
                 📅 October 29, 2025 (Wednesday)<br>
                 📁 18 files (15 photos, 3 videos)
             </p>
-            <a href="https://www.google.com/maps?q=32.8604666666667,-97.1538472222222" target="_blank" style="font-size: 11px; color: #2E86AB;">
+            <a href="https://www.google.com/maps?q=32.8604666666667,-97.1538472222222" target="_blank" style="font-size: 12px; color: #3b82f6; font-weight: 600; text-decoration: none;">
                 📍 View on Google Maps
             </a>
             
@@ -465,7 +740,7 @@
 
             var circle_marker_q7dz82qw63i0jt4ylalorn8j47wgf4n2 = L.circleMarker(
                 [32.8604666666667, -97.1538472222222],
-                {"bubblingMouseEvents": true, "color": "#A23B72", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#A23B72", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
             ).addTo(map);
 
 
@@ -478,21 +753,13 @@
 
 
             var div_icon_lrqfo9159dwfw7n1ot9ql4pbxmjd3wic = L.divIcon({
-                html: `
-                <div style="font-size: 10px;
-                            font-weight: bold;
-                            color: white;
-                            text-align: center;
-                            margin-top: -20px;
-                            text-shadow: 1px 1px 2px black;">
-                    P2
-                </div>
-            `,
+                html: `<div>2</div>`,
                 className: "empty"
             });
 
 
                 marker_vgmbfadcza0qq26kfsxxgv2vao232txp.setIcon(div_icon_lrqfo9159dwfw7n1ot9ql4pbxmjd3wic);
+                markerReferences[2] = marker_h24qptjl28pzvgxq5w6j0rogf14ak8i4;
 
 
             var marker_iromq1tel4rogqig4hev4m6fr4lzh04c = L.marker(
@@ -504,7 +771,7 @@
             var icon_3dhej4h5anj4ujy7b341japdosrd42wb = L.AwesomeMarkers.icon(
                 {
                     markerColor: "white",
-                    iconColor: "#A23B72",
+                    iconColor: "#a855f7",
                     icon: "star",
                     prefix: "fa",
                     extraClasses: "fa-rotate-0"
@@ -519,16 +786,16 @@
 
 
                 var html_v0jqz05uas5pc1qz669174qrd5z318x1 = $(`<div id="html_v0jqz05uas5pc1qz669174qrd5z318x1" style="width: 100.0%; height: 100.0%;">
-        <div style="width: 300px; font-family: Arial, sans-serif;">
-            <h4 style="margin: 0 0 10px 0; color: #2E86AB;">Harwood Hills</h4>
-            <p style="margin: 5px 0;"><strong>2452 Highway 121</strong></p>
-            <p style="margin: 5px 0; font-size: 12px;">Bedford, TX 76021</p>
-            <hr style="margin: 10px 0;">
-            <p style="margin: 5px 0; font-size: 11px;">
+        <div style="width: 300px; font-family: 'Inter', sans-serif;">
+            <h4 style="margin: 0 0 12px 0; color: #000000; font-weight: 700; font-size: 18px; font-family: 'Inter', sans-serif;">Harwood Hills</h4>
+            <p style="margin: 5px 0; font-weight: 600; color: #000000;"><strong>2452 Highway 121</strong></p>
+            <p style="margin: 5px 0; font-size: 13px; color: #000000; opacity: 0.7;">Bedford, TX 76021</p>
+            <hr style="margin: 12px 0; border: none; border-top: 1px solid rgba(0,0,0,0.15);">
+            <p style="margin: 8px 0; font-size: 12px; color: #000000; opacity: 0.8; line-height: 1.6;">
                 📅 October 30, 2025 (Thursday)<br>
                 📁 29 files (28 photos, 1 videos)
             </p>
-            <a href="https://www.google.com/maps?q=32.8500111111111,-97.110925" target="_blank" style="font-size: 11px; color: #2E86AB;">
+            <a href="https://www.google.com/maps?q=32.8500111111111,-97.110925" target="_blank" style="font-size: 12px; color: #3b82f6; font-weight: 600; text-decoration: none;">
                 📍 View on Google Maps
             </a>
             
@@ -568,7 +835,7 @@
 
             var circle_marker_lyn3lklg83y1y1vx6ln2cktfyoe9ufv9 = L.circleMarker(
                 [32.8500111111111, -97.110925],
-                {"bubblingMouseEvents": true, "color": "#A23B72", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#A23B72", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
             ).addTo(map);
 
 
@@ -581,21 +848,13 @@
 
 
             var div_icon_hvmca6v5y06lw6vldi803lp0qeiv6tyj = L.divIcon({
-                html: `
-                <div style="font-size: 10px;
-                            font-weight: bold;
-                            color: white;
-                            text-align: center;
-                            margin-top: -20px;
-                            text-shadow: 1px 1px 2px black;">
-                    P3
-                </div>
-            `,
+                html: `<div>3</div>`,
                 className: "empty"
             });
 
 
                 marker_qib07014ajn9kzrv3rm8nsom8l9lmwmi.setIcon(div_icon_hvmca6v5y06lw6vldi803lp0qeiv6tyj);
+                markerReferences[3] = marker_iromq1tel4rogqig4hev4m6fr4lzh04c;
 
 
             var marker_qe8hwkq8s2j1hb93ocjozt84ic55tc7p = L.marker(
@@ -607,7 +866,7 @@
             var icon_u5qv2ll3ehzz2uek1prmzicif56he1si = L.AwesomeMarkers.icon(
                 {
                     markerColor: "white",
-                    iconColor: "#A23B72",
+                    iconColor: "#a855f7",
                     icon: "star",
                     prefix: "fa",
                     extraClasses: "fa-rotate-0"
@@ -622,16 +881,16 @@
 
 
                 var html_15h1l1zpm1smelthafsn451wb2c7hox9 = $(`<div id="html_15h1l1zpm1smelthafsn451wb2c7hox9" style="width: 100.0%; height: 100.0%;">
-        <div style="width: 300px; font-family: Arial, sans-serif;">
-            <h4 style="margin: 0 0 10px 0; color: #2E86AB;">Huntington Glen</h4>
-            <p style="margin: 5px 0;"><strong>2900 Harwood Road</strong></p>
-            <p style="margin: 5px 0; font-size: 12px;">Bedford, TX 76021</p>
-            <hr style="margin: 10px 0;">
-            <p style="margin: 5px 0; font-size: 11px;">
+        <div style="width: 300px; font-family: 'Inter', sans-serif;">
+            <h4 style="margin: 0 0 12px 0; color: #000000; font-weight: 700; font-size: 18px; font-family: 'Inter', sans-serif;">Huntington Glen</h4>
+            <p style="margin: 5px 0; font-weight: 600; color: #000000;"><strong>2900 Harwood Road</strong></p>
+            <p style="margin: 5px 0; font-size: 13px; color: #000000; opacity: 0.7;">Bedford, TX 76021</p>
+            <hr style="margin: 12px 0; border: none; border-top: 1px solid rgba(0,0,0,0.15);">
+            <p style="margin: 8px 0; font-size: 12px; color: #000000; opacity: 0.8; line-height: 1.6;">
                 📅 October 29, 2025 (Wednesday)<br>
                 📁 18 files (16 photos, 2 videos)
             </p>
-            <a href="https://www.google.com/maps?q=32.8509361111111,-97.1189277777778" target="_blank" style="font-size: 11px; color: #2E86AB;">
+            <a href="https://www.google.com/maps?q=32.8509361111111,-97.1189277777778" target="_blank" style="font-size: 12px; color: #3b82f6; font-weight: 600; text-decoration: none;">
                 📍 View on Google Maps
             </a>
             
@@ -671,7 +930,7 @@
 
             var circle_marker_qei4kpfwquvhfd16tnyrc8c8ze8nwtq3 = L.circleMarker(
                 [32.8509361111111, -97.1189277777778],
-                {"bubblingMouseEvents": true, "color": "#A23B72", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#A23B72", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
             ).addTo(map);
 
 
@@ -684,21 +943,13 @@
 
 
             var div_icon_3abp09xutvg8i2lwn9yn5b6fha1i5dhe = L.divIcon({
-                html: `
-                <div style="font-size: 10px;
-                            font-weight: bold;
-                            color: white;
-                            text-align: center;
-                            margin-top: -20px;
-                            text-shadow: 1px 1px 2px black;">
-                    P4
-                </div>
-            `,
+                html: `<div>4</div>`,
                 className: "empty"
             });
 
 
                 marker_xpa5znl8idwfr2dt39dsx4zfzdml5r6x.setIcon(div_icon_3abp09xutvg8i2lwn9yn5b6fha1i5dhe);
+                markerReferences[4] = marker_qe8hwkq8s2j1hb93ocjozt84ic55tc7p;
 
 
             var marker_8xjry0k6a9yq81a1vcl0sa3zi3f7gn83 = L.marker(
@@ -710,7 +961,7 @@
             var icon_ixycc2kab8hu2ihoq6ann36rgjx5v2i6 = L.AwesomeMarkers.icon(
                 {
                     markerColor: "white",
-                    iconColor: "#A23B72",
+                    iconColor: "#a855f7",
                     icon: "star",
                     prefix: "fa",
                     extraClasses: "fa-rotate-0"
@@ -725,16 +976,16 @@
 
 
                 var html_u4q6txd6056ynrn6ae6ig01z8h880pag = $(`<div id="html_u4q6txd6056ynrn6ae6ig01z8h880pag" style="width: 100.0%; height: 100.0%;">
-        <div style="width: 300px; font-family: Arial, sans-serif;">
-            <h4 style="margin: 0 0 10px 0; color: #2E86AB;">Palisades at Bear Creek</h4>
-            <p style="margin: 5px 0;"><strong>200 Bear Creek Drive</strong></p>
-            <p style="margin: 5px 0; font-size: 12px;">Euless, TX 76039</p>
-            <hr style="margin: 10px 0;">
-            <p style="margin: 5px 0; font-size: 11px;">
+        <div style="width: 300px; font-family: 'Inter', sans-serif;">
+            <h4 style="margin: 0 0 12px 0; color: #000000; font-weight: 700; font-size: 18px; font-family: 'Inter', sans-serif;">Palisades at Bear Creek</h4>
+            <p style="margin: 5px 0; font-weight: 600; color: #000000;"><strong>200 Bear Creek Drive</strong></p>
+            <p style="margin: 5px 0; font-size: 13px; color: #000000; opacity: 0.7;">Euless, TX 76039</p>
+            <hr style="margin: 12px 0; border: none; border-top: 1px solid rgba(0,0,0,0.15);">
+            <p style="margin: 8px 0; font-size: 12px; color: #000000; opacity: 0.8; line-height: 1.6;">
                 📅 October 29, 2025 (Wednesday)<br>
                 📁 26 files (25 photos, 1 videos)
             </p>
-            <a href="https://www.google.com/maps?q=32.8727333333333,-97.0849305555556" target="_blank" style="font-size: 11px; color: #2E86AB;">
+            <a href="https://www.google.com/maps?q=32.8727333333333,-97.0849305555556" target="_blank" style="font-size: 12px; color: #3b82f6; font-weight: 600; text-decoration: none;">
                 📍 View on Google Maps
             </a>
             
@@ -774,7 +1025,7 @@
 
             var circle_marker_51j2mj4nzx45d9enp9lv7rljb47zc5o0 = L.circleMarker(
                 [32.8727333333333, -97.0849305555556],
-                {"bubblingMouseEvents": true, "color": "#A23B72", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#A23B72", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
             ).addTo(map);
 
 
@@ -787,21 +1038,13 @@
 
 
             var div_icon_rhmhq4anetlgcdj5m2xbx6utwkw65g9k = L.divIcon({
-                html: `
-                <div style="font-size: 10px;
-                            font-weight: bold;
-                            color: white;
-                            text-align: center;
-                            margin-top: -20px;
-                            text-shadow: 1px 1px 2px black;">
-                    P5
-                </div>
-            `,
+                html: `<div>5</div>`,
                 className: "empty"
             });
 
 
                 marker_pjsuc0km678d3lkc886miuymoc4tfgs2.setIcon(div_icon_rhmhq4anetlgcdj5m2xbx6utwkw65g9k);
+                markerReferences[5] = marker_8xjry0k6a9yq81a1vcl0sa3zi3f7gn83;
 
 
             var marker_adqwf89x1dvtbtp2brqnfq4yt8mml42m = L.marker(
@@ -813,7 +1056,7 @@
             var icon_qncfj4owudjsntihukfehvhop5zjr8w2 = L.AwesomeMarkers.icon(
                 {
                     markerColor: "white",
-                    iconColor: "#A23B72",
+                    iconColor: "#a855f7",
                     icon: "star",
                     prefix: "fa",
                     extraClasses: "fa-rotate-0"
@@ -828,16 +1071,16 @@
 
 
                 var html_5dvw6fwt7mmj37taar8k3z8dee88qniq = $(`<div id="html_5dvw6fwt7mmj37taar8k3z8dee88qniq" style="width: 100.0%; height: 100.0%;">
-        <div style="width: 300px; font-family: Arial, sans-serif;">
-            <h4 style="margin: 0 0 10px 0; color: #2E86AB;">Park Place</h4>
-            <p style="margin: 5px 0;"><strong>1124 Park Place</strong></p>
-            <p style="margin: 5px 0; font-size: 12px;">Euless, TX 76039</p>
-            <hr style="margin: 10px 0;">
-            <p style="margin: 5px 0; font-size: 11px;">
+        <div style="width: 300px; font-family: 'Inter', sans-serif;">
+            <h4 style="margin: 0 0 12px 0; color: #000000; font-weight: 700; font-size: 18px; font-family: 'Inter', sans-serif;">Park Place</h4>
+            <p style="margin: 5px 0; font-weight: 600; color: #000000;"><strong>1124 Park Place</strong></p>
+            <p style="margin: 5px 0; font-size: 13px; color: #000000; opacity: 0.7;">Euless, TX 76039</p>
+            <hr style="margin: 12px 0; border: none; border-top: 1px solid rgba(0,0,0,0.15);">
+            <p style="margin: 8px 0; font-size: 12px; color: #000000; opacity: 0.8; line-height: 1.6;">
                 📅 October 29, 2025 (Wednesday)<br>
                 📁 5 files (2 photos, 3 videos)
             </p>
-            <a href="https://www.google.com/maps?q=32.8527611111111,-97.0765388888889" target="_blank" style="font-size: 11px; color: #2E86AB;">
+            <a href="https://www.google.com/maps?q=32.8527611111111,-97.0765388888889" target="_blank" style="font-size: 12px; color: #3b82f6; font-weight: 600; text-decoration: none;">
                 📍 View on Google Maps
             </a>
             
@@ -877,7 +1120,7 @@
 
             var circle_marker_an43smxhaygj0b6hw4lheuet3df5f9ka = L.circleMarker(
                 [32.8527611111111, -97.0765388888889],
-                {"bubblingMouseEvents": true, "color": "#A23B72", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#A23B72", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
             ).addTo(map);
 
 
@@ -890,21 +1133,13 @@
 
 
             var div_icon_xqjzndsuury12ngajaqgjpcs32k5yn1h = L.divIcon({
-                html: `
-                <div style="font-size: 10px;
-                            font-weight: bold;
-                            color: white;
-                            text-align: center;
-                            margin-top: -20px;
-                            text-shadow: 1px 1px 2px black;">
-                    P6
-                </div>
-            `,
+                html: `<div>6</div>`,
                 className: "empty"
             });
 
 
                 marker_kua6c35mo0m1bxwn8neel6jygkpyw8vf.setIcon(div_icon_xqjzndsuury12ngajaqgjpcs32k5yn1h);
+                markerReferences[6] = marker_adqwf89x1dvtbtp2brqnfq4yt8mml42m;
 
 
             var marker_bobbrunvvje60b4i77atcpbq0m1jpdkp = L.marker(
@@ -916,7 +1151,7 @@
             var icon_cgd7fibehfxj3cuo6zvlrnkoapgvkshc = L.AwesomeMarkers.icon(
                 {
                     markerColor: "white",
-                    iconColor: "#2E86AB",
+                    iconColor: "#3b82f6",
                     icon: "star",
                     prefix: "fa",
                     extraClasses: "fa-rotate-0"
@@ -931,16 +1166,16 @@
 
 
                 var html_q5pzzcbcktuoxk1gujrrydfkn4e9fknq = $(`<div id="html_q5pzzcbcktuoxk1gujrrydfkn4e9fknq" style="width: 100.0%; height: 100.0%;">
-        <div style="width: 300px; font-family: Arial, sans-serif;">
-            <h4 style="margin: 0 0 10px 0; color: #2E86AB;">The Pointe At Fair Oaks</h4>
-            <p style="margin: 5px 0;"><strong>301 Fair Oaks Boulevard</strong></p>
-            <p style="margin: 5px 0; font-size: 12px;">Euless, TX 76039</p>
-            <hr style="margin: 10px 0;">
-            <p style="margin: 5px 0; font-size: 11px;">
+        <div style="width: 300px; font-family: 'Inter', sans-serif;">
+            <h4 style="margin: 0 0 12px 0; color: #000000; font-weight: 700; font-size: 18px; font-family: 'Inter', sans-serif;">The Pointe At Fair Oaks</h4>
+            <p style="margin: 5px 0; font-weight: 600; color: #000000;"><strong>301 Fair Oaks Boulevard</strong></p>
+            <p style="margin: 5px 0; font-size: 13px; color: #000000; opacity: 0.7;">Euless, TX 76039</p>
+            <hr style="margin: 12px 0; border: none; border-top: 1px solid rgba(0,0,0,0.15);">
+            <p style="margin: 8px 0; font-size: 12px; color: #000000; opacity: 0.8; line-height: 1.6;">
                 📅 October 29, 2025 (Wednesday)<br>
                 📁 11 files (11 photos, 0 videos)
             </p>
-            <a href="https://www.google.com/maps?q=32.8532555555556,-97.0859388888889" target="_blank" style="font-size: 11px; color: #2E86AB;">
+            <a href="https://www.google.com/maps?q=32.8532555555556,-97.0859388888889" target="_blank" style="font-size: 12px; color: #3b82f6; font-weight: 600; text-decoration: none;">
                 📍 View on Google Maps
             </a>
             
@@ -980,7 +1215,7 @@
 
             var circle_marker_a08dx2mzsw0vb17bp7xuzu8trwf2pydn = L.circleMarker(
                 [32.8532555555556, -97.0859388888889],
-                {"bubblingMouseEvents": true, "color": "#2E86AB", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#2E86AB", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
             ).addTo(map);
 
 
@@ -993,21 +1228,13 @@
 
 
             var div_icon_ijflj6bbvkr7jhx40ynyja4uj50dsyrp = L.divIcon({
-                html: `
-                <div style="font-size: 10px;
-                            font-weight: bold;
-                            color: white;
-                            text-align: center;
-                            margin-top: -20px;
-                            text-shadow: 1px 1px 2px black;">
-                    P7
-                </div>
-            `,
+                html: `<div>7</div>`,
                 className: "empty"
             });
 
 
                 marker_a2d4fo99r59k5uy0owivwvjpqtyt0qke.setIcon(div_icon_ijflj6bbvkr7jhx40ynyja4uj50dsyrp);
+                markerReferences[7] = marker_bobbrunvvje60b4i77atcpbq0m1jpdkp;
 
 
             var marker_gmfunm0u28erjnhvib4f2p90sk56iojt = L.marker(
@@ -1019,7 +1246,7 @@
             var icon_awz0xnqu3o2cmwa3ns5kdpc2aflhx9o9 = L.AwesomeMarkers.icon(
                 {
                     markerColor: "white",
-                    iconColor: "#A23B72",
+                    iconColor: "#a855f7",
                     icon: "star",
                     prefix: "fa",
                     extraClasses: "fa-rotate-0"
@@ -1034,16 +1261,16 @@
 
 
                 var html_g6ydgdace0w0en9beud122jlcdh4l4o5 = $(`<div id="html_g6ydgdace0w0en9beud122jlcdh4l4o5" style="width: 100.0%; height: 100.0%;">
-        <div style="width: 300px; font-family: Arial, sans-serif;">
-            <h4 style="margin: 0 0 10px 0; color: #2E86AB;">Willow Ridge</h4>
-            <p style="margin: 5px 0;"><strong>1050 West Ash Lane</strong></p>
-            <p style="margin: 5px 0; font-size: 12px;">Euless, TX 76039</p>
-            <hr style="margin: 10px 0;">
-            <p style="margin: 5px 0; font-size: 11px;">
+        <div style="width: 300px; font-family: 'Inter', sans-serif;">
+            <h4 style="margin: 0 0 12px 0; color: #000000; font-weight: 700; font-size: 18px; font-family: 'Inter', sans-serif;">Willow Ridge</h4>
+            <p style="margin: 5px 0; font-weight: 600; color: #000000;"><strong>1050 West Ash Lane</strong></p>
+            <p style="margin: 5px 0; font-size: 13px; color: #000000; opacity: 0.7;">Euless, TX 76039</p>
+            <hr style="margin: 12px 0; border: none; border-top: 1px solid rgba(0,0,0,0.15);">
+            <p style="margin: 8px 0; font-size: 12px; color: #000000; opacity: 0.8; line-height: 1.6;">
                 📅 October 30, 2025 (Thursday)<br>
                 📁 28 files (24 photos, 4 videos)
             </p>
-            <a href="https://www.google.com/maps?q=32.8619694444444,-97.0991527777778" target="_blank" style="font-size: 11px; color: #2E86AB;">
+            <a href="https://www.google.com/maps?q=32.8619694444444,-97.0991527777778" target="_blank" style="font-size: 12px; color: #3b82f6; font-weight: 600; text-decoration: none;">
                 📍 View on Google Maps
             </a>
             
@@ -1083,7 +1310,7 @@
 
             var circle_marker_ivc6n9sx8mtxx6xkh2h3lql6sd9r82pu = L.circleMarker(
                 [32.8619694444444, -97.0991527777778],
-                {"bubblingMouseEvents": true, "color": "#A23B72", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#A23B72", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
             ).addTo(map);
 
 
@@ -1096,21 +1323,22 @@
 
 
             var div_icon_h4zennounwz1psnvf3207pgjaxs82ple = L.divIcon({
-                html: `
-                <div style="font-size: 10px;
-                            font-weight: bold;
-                            color: white;
-                            text-align: center;
-                            margin-top: -20px;
-                            text-shadow: 1px 1px 2px black;">
-                    P8
-                </div>
-            `,
+                html: `<div>8</div>`,
                 className: "empty"
             });
 
 
                 marker_h0hjjh2qjrzzp4m7ty93cotbv9766rd6.setIcon(div_icon_h4zennounwz1psnvf3207pgjaxs82ple);
+                markerReferences[8] = marker_gmfunm0u28erjnhvib4f2p90sk56iojt;
+
+    // Focus marker function - zoom to marker and open popup
+    function focusMarker(num) {
+        const marker = markerReferences[num];
+        if (marker) {
+            map.setView(marker.getLatLng(), 15);
+            marker.openPopup();
+        }
+    }
 
 
             L.control.fullscreen({

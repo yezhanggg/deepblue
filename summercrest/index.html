@@ -47,6 +47,7 @@
 
                 .awesome-marker i {
                     font-size: 20px !important;
+                    margin-left: 2px !important;
                 }
 
                 /* Circle markers with better visibility */
@@ -76,7 +77,7 @@
                     z-index: 1000 !important;
                 }
 
-                /* Modal styles with glassmorphism */
+                /* Gallery Modal - White Transparent Glassmorphism */
                 .gallery-modal {
                     display: none;
                     position: fixed;
@@ -85,66 +86,97 @@
                     top: 0;
                     width: 100%;
                     height: 100%;
-                    background-color: rgba(157, 143, 170, 0.7);
-                    backdrop-filter: blur(12px);
-                    -webkit-backdrop-filter: blur(12px);
+                    background-color: rgba(255, 255, 255, 0.7);
+                    backdrop-filter: blur(16px);
+                    -webkit-backdrop-filter: blur(16px);
                 }
 
                 .gallery-modal-content {
                     position: relative;
-                    margin: 2% auto;
-                    width: 90%;
-                    height: 90%;
-                    background: rgba(255, 255, 255, 0.95);
-                    backdrop-filter: blur(20px);
-                    -webkit-backdrop-filter: blur(20px);
+                    margin: 1.5% auto;
+                    width: 94%;
+                    height: 94%;
+                    background: rgba(255, 255, 255, 0.98);
+                    backdrop-filter: blur(40px);
+                    -webkit-backdrop-filter: blur(40px);
                     border-radius: 24px;
                     overflow: hidden;
-                    border: 1px solid rgba(255, 255, 255, 0.3);
-                    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                    border: 1px solid rgba(255, 255, 255, 0.8);
+                    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15),
+                                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+                    display: flex;
+                    flex-direction: column;
                 }
 
                 .gallery-modal-header {
-                    background: rgba(255, 255, 255, 0.3);
-                    backdrop-filter: blur(40px);
-                    -webkit-backdrop-filter: blur(40px);
-                    color: #000000;
-                    padding: 20px 24px;
+                    background: rgba(255, 255, 255, 0.6);
+                    backdrop-filter: blur(20px);
+                    -webkit-backdrop-filter: blur(20px);
+                    color: #1f2937;
+                    padding: 20px 28px;
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
-                    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+                    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+                    flex-shrink: 0;
                 }
 
                 .gallery-modal-close {
-                    color: #000000;
-                    font-size: 32px;
+                    color: #4b5563;
+                    font-size: 28px;
                     font-weight: 300;
                     cursor: pointer;
-                    background: none;
+                    background: rgba(0, 0, 0, 0.04);
                     border: none;
-                    transition: all 0.3s ease;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                     line-height: 1;
                     width: 40px;
                     height: 40px;
                     border-radius: 12px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
                 }
 
                 .gallery-modal-close:hover {
-                    background: rgba(255, 255, 255, 0.25);
-                    transform: rotate(90deg);
+                    background: rgba(239, 68, 68, 0.12);
+                    color: #ef4444;
+                    transform: scale(1.08);
                 }
 
                 .gallery-modal-body {
-                    width: 100%;
-                    height: calc(100% - 80px);
-                    background: white;
+                    flex: 1;
+                    background: rgba(249, 250, 251, 0.3);
+                    overflow: hidden;
+                    display: flex;
+                    flex-direction: column;
                 }
 
-                .gallery-modal iframe {
+                .gallery-main-display {
+                    flex: 1;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 20px;
+                    position: relative;
+                    overflow: hidden;
+                }
+
+                .gallery-main-display iframe {
                     width: 100%;
                     height: 100%;
                     border: none;
+                    border-radius: 12px;
+                    background: white;
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+                }
+
+                .gallery-loading-text {
+                    text-align: center;
+                    padding: 60px 20px;
+                    color: #6b7280;
+                    font-size: 15px;
+                    font-weight: 500;
                 }
 
                 .drive-buttons {
@@ -208,6 +240,13 @@
                     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.4);
                     border: 1px solid rgba(255, 255, 255, 0.3);
                     font-family: 'Inter', sans-serif;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                }
+
+                .leaflet-popup-content-wrapper:hover {
+                    transform: translateY(-4px);
+                    background: rgba(255, 255, 255, 0.35);
+                    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.5);
                 }
 
                 .leaflet-popup-content {
@@ -249,6 +288,28 @@
                     display: none !important;
                 }
 
+                /* Interactive hover effects for UI elements */
+                #headerBox {
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                }
+
+                #headerBox:hover {
+                    transform: translateY(-4px);
+                    background: rgba(255, 255, 255, 0.3);
+                    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+                }
+
+                /* Legend and Map Controls hover */
+                #headerBox + a + div > div {
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                }
+
+                #headerBox + a + div > div:hover {
+                    transform: translateY(-4px);
+                    background: rgba(255, 255, 255, 0.3);
+                    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+                }
+
                 /* Search bar styles */
                 .search-wrapper {
                     position: fixed;
@@ -270,6 +331,13 @@
                     align-items: center;
                     gap: 8px;
                     font-family: 'Inter', sans-serif;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                }
+
+                .search-container:hover {
+                    transform: translateY(-4px);
+                    background: rgba(255, 255, 255, 0.3);
+                    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.5);
                 }
 
                 .search-input {
@@ -542,11 +610,13 @@
     <div id="galleryModal" class="gallery-modal">
         <div class="gallery-modal-content">
             <div class="gallery-modal-header">
-                <h3 id="modalTitle" style="margin: 0; font-weight: 700;">Property Photos</h3>
+                <h3 id="modalTitle" style="margin: 0; font-weight: 700; font-size: 18px; letter-spacing: -0.02em;">Property Photos</h3>
                 <button class="gallery-modal-close" onclick="closeGallery()">&times;</button>
             </div>
             <div class="gallery-modal-body">
-                <iframe id="galleryFrame" src=""></iframe>
+                <div class="gallery-main-display" id="galleryMainDisplay">
+                    <div class="gallery-loading-text">Loading gallery...</div>
+                </div>
             </div>
         </div>
     </div>
@@ -596,8 +666,8 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                width: 52px;
-                height: 52px;
+                width: 40px;
+                height: 40px;
                 background: rgba(255, 255, 255, 0.35);
                 backdrop-filter: blur(40px);
                 -webkit-backdrop-filter: blur(40px);
@@ -605,7 +675,7 @@
                 border-radius: 50%;
                 color: #000000;
                 text-decoration: none;
-                font-size: 22px;
+                font-size: 18px;
                 font-weight: 600;
                 font-family: 'Inter', sans-serif;
                 transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -614,25 +684,62 @@
         ←
     </a>
 
+    <!-- Legend and Map Controls -->
     <div style="position: fixed;
                 bottom: 20px;
                 left: 20px;
-                width: 200px;
-                background: rgba(255, 255, 255, 0.25);
-                backdrop-filter: blur(40px);
-                -webkit-backdrop-filter: blur(40px);
-                border: 1px solid rgba(255, 255, 255, 0.3);
                 z-index: 9999;
-                padding: 18px 20px;
-                border-radius: 20px;
-                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+                display: flex;
+                gap: 12px;
                 font-family: 'Inter', sans-serif;">
-        <h4 style="margin: 0 0 12px 0; color: #000000; font-size: 14px; font-weight: 700; letter-spacing: -0.01em;">Legend</h4>
-        <p style="margin: 0; font-size: 13px; color: #000000; line-height: 1.8; font-weight: 600;">
-            <span style="color: #3b82f6; font-size: 16px;">●</span> Photos Only<br>
-            <span style="color: #f59e0b; font-size: 16px;">●</span> Videos Only<br>
-            <span style="color: #a855f7; font-size: 16px;">●</span> Photos + Videos
-        </p>
+
+        <!-- Legend -->
+        <div style="width: 200px;
+                    background: rgba(255, 255, 255, 0.25);
+                    backdrop-filter: blur(40px);
+                    -webkit-backdrop-filter: blur(40px);
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                    padding: 18px 20px;
+                    border-radius: 20px;
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.4);">
+            <h4 style="margin: 0 0 12px 0; color: #000000; font-size: 14px; font-weight: 700; letter-spacing: -0.01em;">Legend</h4>
+            <p style="margin: 0; font-size: 13px; color: #000000; line-height: 1.8; font-weight: 600;">
+                <span style="color: #3b82f6; font-size: 16px;">●</span> Photos Only<br>
+                <span style="color: #f59e0b; font-size: 16px;">●</span> Videos Only<br>
+                <span style="color: #a855f7; font-size: 16px;">●</span> Photos + Videos
+            </p>
+        </div>
+
+        <!-- Map Controls -->
+        <div id="mapControls" style="width: 200px;
+                    background: rgba(255, 255, 255, 0.25);
+                    backdrop-filter: blur(40px);
+                    -webkit-backdrop-filter: blur(40px);
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                    padding: 18px 20px;
+                    border-radius: 20px;
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.4);">
+            <h4 style="margin: 0 0 12px 0; color: #000000; font-size: 14px; font-weight: 700; letter-spacing: -0.01em;">Map View</h4>
+
+            <!-- Layer Switcher -->
+            <div style="margin-bottom: 16px;">
+                <p style="margin: 0 0 8px 0; font-size: 12px; color: #000000; font-weight: 600; opacity: 0.7;">Base Layer</p>
+                <select id="layerSelector" onchange="switchMapLayer(this.value)" style="width: 100%;
+                        padding: 8px 12px;
+                        border-radius: 10px;
+                        border: 1px solid rgba(0, 0, 0, 0.15);
+                        background: rgba(255, 255, 255, 0.9);
+                        color: #000000;
+                        font-size: 13px;
+                        font-weight: 600;
+                        font-family: 'Inter', sans-serif;
+                        cursor: pointer;
+                        transition: all 0.3s;">
+                    <option value="roadmap">Roadmap</option>
+                    <option value="hybrid">Satellite</option>
+                </select>
+            </div>
+        </div>
     </div>
 
     <!-- Search Bar -->
@@ -651,32 +758,51 @@
 
 </body>
 <script>
+    // Map layer control variables
+    let currentGoogleLayer = null;
+
     // Gallery modal functions
     function openGallery(folderId, propertyName) {
         const modal = document.getElementById('galleryModal');
-        const frame = document.getElementById('galleryFrame');
         const title = document.getElementById('modalTitle');
+        const mainDisplay = document.getElementById('galleryMainDisplay');
 
-        title.textContent = propertyName + ' - Photo Gallery';
-        frame.src = 'https://drive.google.com/embeddedfolderview?id=' + folderId + '#grid';
+        // Set title and show modal
+        title.textContent = propertyName;
         modal.style.display = 'block';
+
+        // Clear and create iframe for folder view
+        mainDisplay.innerHTML = '';
+
+        const folderFrame = document.createElement('iframe');
+        folderFrame.src = `https://drive.google.com/embeddedfolderview?id=${folderId}#grid`;
+        folderFrame.allow = 'autoplay';
+        mainDisplay.appendChild(folderFrame);
     }
 
     function closeGallery() {
         const modal = document.getElementById('galleryModal');
-        const frame = document.getElementById('galleryFrame');
+        const mainDisplay = document.getElementById('galleryMainDisplay');
 
         modal.style.display = 'none';
-        frame.src = '';
+        mainDisplay.innerHTML = '<div class="gallery-loading-text">Loading gallery...</div>';
     }
 
     // Close modal when clicking outside
     window.onclick = function(event) {
         const modal = document.getElementById('galleryModal');
-        if (event.target == modal) {
+        if (event.target === modal) {
             closeGallery();
         }
-    }
+    };
+
+    // Keyboard shortcut to close
+    document.addEventListener('keydown', function(event) {
+        const modal = document.getElementById('galleryModal');
+        if (modal.style.display === 'block' && event.key === 'Escape') {
+            closeGallery();
+        }
+    });
 
     // Toggle property list dropdown
     function togglePropertyList() {
@@ -705,12 +831,13 @@
 
 
 
-            var googleLayer = L.gridLayer.googleMutant({
+            // Initialize with roadmap layer
+            currentGoogleLayer = L.gridLayer.googleMutant({
                 type: 'roadmap',
                 maxZoom: 21
             });
 
-            googleLayer.addTo(map);
+            currentGoogleLayer.addTo(map);
 
             // Load Google Maps API
             var script = document.createElement('script');
@@ -1157,6 +1284,21 @@
                 alert('Location not found. Please try a different search term.');
             }
         });
+    }
+
+    // Switch map layer function
+    function switchMapLayer(layerType) {
+        // Remove current layer
+        if (currentGoogleLayer) {
+            map.removeLayer(currentGoogleLayer);
+        }
+
+        // Add new layer
+        currentGoogleLayer = L.gridLayer.googleMutant({
+            type: layerType,
+            maxZoom: 21
+        });
+        currentGoogleLayer.addTo(map);
     }
 
 

@@ -840,6 +840,11 @@
         arrow.classList.toggle('expanded');
     }
 
+    // Auto-expand property list after 2 seconds
+    setTimeout(() => {
+        togglePropertyList();
+    }, 2000);
+
     // Store marker references
     var markerReferences = {};
 

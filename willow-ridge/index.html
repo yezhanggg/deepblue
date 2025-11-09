@@ -225,7 +225,154 @@
                     color: #000000 !important;
                     font-size: 24px !important;
                     font-weight: 300 !important;
-                    padding: 8px 12px !important;
+                    padding: 4px 8px !important;
+                    width: 30px !important;
+                    height: 30px !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    top: 8px !important;
+                    right: 8px !important;
+                    border-radius: 8px !important;
+                    transition: all 0.3s ease !important;
+                    background: rgba(255, 255, 255, 0.2) !important;
+                    line-height: 1 !important;
+                }
+
+                .leaflet-popup-close-button:hover {
+                    background: rgba(255, 255, 255, 0.4) !important;
+                    transform: rotate(90deg) !important;
+                }
+
+                /* Hide Leaflet attribution */
+                .leaflet-control-attribution {
+                    display: none !important;
+                }
+
+                /* Search bar styles */
+                .search-wrapper {
+                    position: fixed;
+                    bottom: 20px;
+                    right: 20px;
+                    z-index: 9999;
+                }
+
+                .search-container {
+                    position: relative;
+                    background: rgba(255, 255, 255, 0.25);
+                    backdrop-filter: blur(40px);
+                    -webkit-backdrop-filter: blur(40px);
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                    border-radius: 20px;
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+                    padding: 12px 16px;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    font-family: 'Inter', sans-serif;
+                }
+
+                .search-input {
+                    background: rgba(255, 255, 255, 0.3);
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                    border-radius: 12px;
+                    padding: 10px 14px;
+                    font-size: 13px;
+                    font-family: 'Inter', sans-serif;
+                    font-weight: 600;
+                    color: #000000;
+                    width: 330px;
+                    outline: none;
+                    transition: all 0.3s ease;
+                }
+
+                .search-input::placeholder {
+                    color: rgba(0, 0, 0, 0.5);
+                    font-weight: 500;
+                }
+
+                .search-input:focus {
+                    background: rgba(255, 255, 255, 0.5);
+                    border-color: rgba(255, 255, 255, 0.5);
+                    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+                }
+
+                .search-button {
+                    background: rgba(255, 255, 255, 0.3);
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                    border-radius: 12px;
+                    padding: 10px 18px;
+                    font-size: 14px;
+                    font-family: 'Inter', sans-serif;
+                    font-weight: 700;
+                    color: #000000;
+                    cursor: pointer;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                }
+
+                .search-button:hover {
+                    background: rgba(255, 255, 255, 0.5);
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                }
+
+                .search-button:active {
+                    transform: translateY(0px);
+                }
+
+                /* Autocomplete suggestions */
+                .autocomplete-suggestions {
+                    position: absolute;
+                    top: calc(100% + 8px);
+                    left: 0;
+                    right: 50px;
+                    background: rgba(255, 255, 255, 0.95);
+                    backdrop-filter: blur(40px);
+                    -webkit-backdrop-filter: blur(40px);
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                    border-radius: 16px;
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+                    max-height: 300px;
+                    overflow-y: auto;
+                    display: none;
+                    z-index: 10000;
+                }
+
+                .autocomplete-suggestions.show {
+                    display: block;
+                }
+
+                .autocomplete-item {
+                    padding: 12px 16px;
+                    cursor: pointer;
+                    font-family: 'Inter', sans-serif;
+                    font-size: 13px;
+                    font-weight: 600;
+                    color: #000000;
+                    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+                    transition: all 0.2s ease;
+                }
+
+                .autocomplete-item:last-child {
+                    border-bottom: none;
+                }
+
+                .autocomplete-item:hover {
+                    background: rgba(59, 130, 246, 0.1);
+                }
+
+                .autocomplete-item i {
+                    margin-right: 8px;
+                    color: #3b82f6;
+                    font-size: 12px;
+                }
+
+                .search-container {
+                    position: relative;
                 }
 
                 /* Back button pulse animation */
@@ -498,6 +645,17 @@
             <span style="color: #f59e0b; font-size: 16px;">●</span> Videos Only<br>
             <span style="color: #a855f7; font-size: 16px;">●</span> Photos + Videos
         </p>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-wrapper">
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search location or address..." oninput="handleSearchInput()" onkeypress="if(event.key==='Enter') searchLocation()" onfocus="showSuggestions()" autocomplete="off">
+            <button onclick="searchLocation()" class="search-button">
+                <i class="fa fa-search"></i>
+            </button>
+            <div id="suggestions" class="autocomplete-suggestions"></div>
+        </div>
     </div>
 
 
@@ -1335,9 +1493,142 @@
     function focusMarker(num) {
         const marker = markerReferences[num];
         if (marker) {
-            map.setView(marker.getLatLng(), 15);
-            marker.openPopup();
+            // Center the marker on screen with smooth animation
+            map.setView(marker.getLatLng(), 16, {
+                animate: true,
+                pan: {
+                    duration: 0.5
+                }
+            });
+            // Open popup after animation
+            setTimeout(() => {
+                marker.openPopup();
+            }, 500);
         }
+    }
+
+    // Autocomplete service
+    let autocompleteService;
+    let placesService;
+    let searchTimeout;
+
+    // Initialize autocomplete service when Google Maps loads
+    setTimeout(() => {
+        autocompleteService = new google.maps.places.AutocompleteService();
+        placesService = new google.maps.places.PlacesService(document.createElement('div'));
+    }, 1000);
+
+    // Handle search input with autocomplete
+    function handleSearchInput() {
+        const input = document.getElementById('searchInput');
+        const suggestionsDiv = document.getElementById('suggestions');
+        const query = input.value.trim();
+
+        clearTimeout(searchTimeout);
+
+        if (query.length < 2) {
+            suggestionsDiv.classList.remove('show');
+            return;
+        }
+
+        searchTimeout = setTimeout(() => {
+            if (autocompleteService) {
+                autocompleteService.getPlacePredictions({
+                    input: query,
+                    types: ['geocode', 'establishment']
+                }, displaySuggestions);
+            }
+        }, 300);
+    }
+
+    // Display autocomplete suggestions
+    function displaySuggestions(predictions, status) {
+        const suggestionsDiv = document.getElementById('suggestions');
+
+        if (status !== google.maps.places.PlacesServiceStatus.OK || !predictions) {
+            suggestionsDiv.classList.remove('show');
+            return;
+        }
+
+        suggestionsDiv.innerHTML = '';
+        predictions.slice(0, 5).forEach(prediction => {
+            const item = document.createElement('div');
+            item.className = 'autocomplete-item';
+            item.innerHTML = `<i class="fa fa-map-marker"></i>${prediction.description}`;
+            item.onclick = () => selectSuggestion(prediction.description);
+            suggestionsDiv.appendChild(item);
+        });
+
+        suggestionsDiv.classList.add('show');
+    }
+
+    // Select a suggestion
+    function selectSuggestion(address) {
+        const input = document.getElementById('searchInput');
+        const suggestionsDiv = document.getElementById('suggestions');
+
+        input.value = address;
+        suggestionsDiv.classList.remove('show');
+        searchLocation();
+    }
+
+    // Show suggestions on focus
+    function showSuggestions() {
+        const input = document.getElementById('searchInput');
+        if (input.value.trim().length >= 2) {
+            handleSearchInput();
+        }
+    }
+
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', function(e) {
+        const suggestionsDiv = document.getElementById('suggestions');
+        const searchInput = document.getElementById('searchInput');
+
+        if (!e.target.closest('.search-container')) {
+            suggestionsDiv.classList.remove('show');
+        }
+    });
+
+    // Search location function
+    function searchLocation() {
+        const searchInput = document.getElementById('searchInput');
+        const suggestionsDiv = document.getElementById('suggestions');
+        const query = searchInput.value.trim();
+
+        suggestionsDiv.classList.remove('show');
+
+        if (!query) {
+            alert('Please enter a location or address to search');
+            return;
+        }
+
+        // Use Google Geocoding API
+        const geocoder = new google.maps.Geocoder();
+
+        geocoder.geocode({ address: query }, function(results, status) {
+            if (status === 'OK' && results[0]) {
+                const location = results[0].geometry.location;
+                const lat = location.lat();
+                const lng = location.lng();
+
+                // Pan and zoom to the location
+                map.setView([lat, lng], 16);
+
+                // Add a temporary marker
+                const searchMarker = L.marker([lat, lng]).addTo(map);
+                searchMarker.bindPopup(`<div style="font-family: 'Inter', sans-serif; font-weight: 600; color: #000000;">
+                    <strong>${results[0].formatted_address}</strong>
+                </div>`).openPopup();
+
+                // Remove the marker after 5 seconds
+                setTimeout(() => {
+                    map.removeLayer(searchMarker);
+                }, 5000);
+            } else {
+                alert('Location not found. Please try a different search term.');
+            }
+        });
     }
 
 

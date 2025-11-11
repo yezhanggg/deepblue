@@ -1892,5 +1892,47 @@
         }, 100);
     });
 
+    // Curtain closing effect when clicking back button
+    document.addEventListener('DOMContentLoaded', function() {
+        const backButton = document.querySelector('a[href="../"]');
+
+        if (backButton) {
+            backButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetUrl = this.href;
+
+                // Create curtain elements
+                const curtainCenter = document.createElement('div');
+                curtainCenter.className = 'curtain-center fade-out';
+
+                const curtainLeft = document.createElement('div');
+                curtainLeft.className = 'curtain-overlay curtain-left open';
+
+                const curtainRight = document.createElement('div');
+                curtainRight.className = 'curtain-overlay curtain-right open';
+
+                // Add to body
+                document.body.appendChild(curtainCenter);
+                document.body.appendChild(curtainLeft);
+                document.body.appendChild(curtainRight);
+
+                // Trigger reflow
+                curtainLeft.offsetHeight;
+
+                // Remove open class to close curtains (slide them to center)
+                setTimeout(function() {
+                    curtainLeft.classList.remove('open');
+                    curtainRight.classList.remove('open');
+                    curtainCenter.classList.remove('fade-out');
+                }, 50);
+
+                // Navigate after animation
+                setTimeout(function() {
+                    window.location.href = targetUrl;
+                }, 1600);
+            });
+        }
+    });
+
 </script>
 </html>

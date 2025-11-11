@@ -576,6 +576,159 @@
                 .header-clickable:hover {
                     opacity: 0.8;
                 }
+
+                /* Glassmorphism Curtain Effect */
+                .curtain-overlay {
+                    position: fixed;
+                    top: 0;
+                    bottom: 0;
+                    width: 50%;
+                    z-index: 10001;
+                    pointer-events: none;
+                    transition: transform 1.5s cubic-bezier(0.65, 0, 0.35, 1);
+                    will-change: transform;
+                }
+
+                .curtain-left {
+                    left: 0;
+                    background: linear-gradient(135deg,
+                        rgba(181, 168, 196, 0.98) 0%,
+                        rgba(157, 143, 170, 0.99) 50%,
+                        rgba(168, 155, 176, 0.98) 100%);
+                    backdrop-filter: blur(60px) saturate(180%);
+                    -webkit-backdrop-filter: blur(60px) saturate(180%);
+                    border-right: 1px solid rgba(255, 255, 255, 0.4);
+                    box-shadow:
+                        4px 0 60px rgba(181, 168, 196, 0.5),
+                        inset -1px 0 0 rgba(255, 255, 255, 0.5);
+                    transform-origin: left center;
+                }
+
+                .curtain-right {
+                    right: 0;
+                    background: linear-gradient(135deg,
+                        rgba(168, 155, 176, 0.98) 0%,
+                        rgba(157, 143, 170, 0.99) 50%,
+                        rgba(181, 168, 196, 0.98) 100%);
+                    backdrop-filter: blur(60px) saturate(180%);
+                    -webkit-backdrop-filter: blur(60px) saturate(180%);
+                    border-left: 1px solid rgba(255, 255, 255, 0.4);
+                    box-shadow:
+                        -4px 0 60px rgba(168, 155, 176, 0.5),
+                        inset 1px 0 0 rgba(255, 255, 255, 0.5);
+                    transform-origin: right center;
+                }
+
+                .curtain-left::before,
+                .curtain-right::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    bottom: 0;
+                    width: 100%;
+                    background: linear-gradient(90deg,
+                        transparent 0%,
+                        rgba(255, 255, 255, 0.15) 50%,
+                        transparent 100%);
+                    animation: shimmer 2s ease-in-out;
+                    pointer-events: none;
+                }
+
+                .curtain-left::after,
+                .curtain-right::after {
+                    content: '';
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    width: 200px;
+                    height: 200px;
+                    background: radial-gradient(circle,
+                        rgba(255, 255, 255, 0.25) 0%,
+                        transparent 70%);
+                    border-radius: 50%;
+                    filter: blur(40px);
+                    animation: glow 1.5s ease-in-out;
+                    pointer-events: none;
+                }
+
+                .curtain-overlay.open.curtain-left {
+                    transform: translateX(-102%) rotateY(5deg) scale(1.02);
+                }
+
+                .curtain-overlay.open.curtain-right {
+                    transform: translateX(102%) rotateY(-5deg) scale(1.02);
+                }
+
+                .curtain-overlay.curtain-left:not(.open) {
+                    transform: translateX(0%) rotateY(0deg) scale(1);
+                }
+
+                .curtain-overlay.curtain-right:not(.open) {
+                    transform: translateX(0%) rotateY(0deg) scale(1);
+                }
+
+                @keyframes shimmer {
+                    0% {
+                        transform: translateX(-100%);
+                        opacity: 0;
+                    }
+                    50% {
+                        opacity: 1;
+                    }
+                    100% {
+                        transform: translateX(100%);
+                        opacity: 0;
+                    }
+                }
+
+                @keyframes glow {
+                    0% {
+                        opacity: 0;
+                        transform: translate(-50%, -50%) scale(0.8);
+                    }
+                    50% {
+                        opacity: 1;
+                        transform: translate(-50%, -50%) scale(1.2);
+                    }
+                    100% {
+                        opacity: 0;
+                        transform: translate(-50%, -50%) scale(1);
+                    }
+                }
+
+                .curtain-center {
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    z-index: 10002;
+                    pointer-events: none;
+                    width: 3px;
+                    height: 100%;
+                    background: linear-gradient(to bottom,
+                        transparent 0%,
+                        rgba(255, 255, 255, 0.7) 20%,
+                        rgba(255, 255, 255, 0.9) 50%,
+                        rgba(255, 255, 255, 0.7) 80%,
+                        transparent 100%);
+                    box-shadow:
+                        0 0 25px rgba(255, 255, 255, 0.9),
+                        0 0 50px rgba(181, 168, 196, 0.7),
+                        0 0 75px rgba(157, 143, 170, 0.5);
+                    opacity: 1;
+                    transition: opacity 1.2s ease-out 0.3s;
+                }
+
+                .curtain-center.fade-out {
+                    opacity: 0;
+                }
+
+                .curtain-overlay.fade {
+                    opacity: 0;
+                    transition: transform 1.5s cubic-bezier(0.65, 0, 0.35, 1),
+                                opacity 0.5s ease-out 1.0s;
+                }
             </style>
 
             <style>html, body {
@@ -605,6 +758,10 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@3.0.0/Control.FullScreen.css"/>
 </head>
 <body>
+    <!-- Glassmorphism Curtain Effect -->
+    <div class="curtain-center"></div>
+    <div class="curtain-overlay curtain-left"></div>
+    <div class="curtain-overlay curtain-right"></div>
 
     <!-- Gallery Modal -->
     <div id="galleryModal" class="gallery-modal">
@@ -1313,6 +1470,37 @@
                 titleCancel: 'Exit fullscreen mode',
                 forceSeparateButton: true
             }).addTo(map);
+
+    // Curtain reveal effect on page load
+    window.addEventListener('load', function() {
+        setTimeout(function() {
+            const curtainLeft = document.querySelector('.curtain-left');
+            const curtainRight = document.querySelector('.curtain-right');
+            const curtainCenter = document.querySelector('.curtain-center');
+
+            // Add open class to trigger sliding animation
+            curtainLeft.classList.add('open');
+            curtainRight.classList.add('open');
+
+            // Add fade class for smooth exit after sliding
+            setTimeout(function() {
+                curtainLeft.classList.add('fade');
+                curtainRight.classList.add('fade');
+            }, 50);
+
+            // Fade out center line
+            setTimeout(function() {
+                curtainCenter.classList.add('fade-out');
+            }, 200);
+
+            // Remove curtain elements after animation completes
+            setTimeout(function() {
+                curtainLeft.remove();
+                curtainRight.remove();
+                curtainCenter.remove();
+            }, 2000);
+        }, 100);
+    });
 
 </script>
 </html>

@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <script src="https://unpkg.com/leaflet.gridlayer.googlemutant@latest/dist/Leaflet.GoogleMutant.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <link rel="preconnect" href="https://fonts.googleapis.com">
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+            <style>
+                body {
+                    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                    background: linear-gradient(135deg, #b5a8c4 0%, #9d8faa 50%, #a89bb0 100%);
+                }
+
+                #map {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container {
+                    font-size: 1rem;
+                    font-family: 'Inter', sans-serif;
+                }
+
+                /* Marker styles for better visibility */
+                .awesome-marker {
+                    filter: drop-shadow(0 0 2px white)
+                            drop-shadow(0 0 3px white)
+                            drop-shadow(0 2px 4px rgba(0,0,0,0.7)) !important;
+                }
+
+                .awesome-marker i {
+                    font-size: 20px !important;
+                    margin-left: 2px !important;
+                }
+
+                /* Circle markers with better visibility */
+                .leaflet-interactive {
+                    stroke-width: 3 !important;
+                }
+
+                /* Label text with better visibility - integrated into marker */
+                .empty div {
+                    position: absolute !important;
+                    top: 8px !important;
+                    left: 50% !important;
+                    transform: translateX(-50%) !important;
+                    background: white !important;
+                    color: #000000 !important;
+                    width: 22px !important;
+                    height: 22px !important;
+                    border-radius: 50% !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    font-weight: 800 !important;
+                    font-size: 13px !important;
+                    font-family: 'Inter', sans-serif !important;
+                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4) !important;
+                    border: 2px solid #000000 !important;
+                    z-index: 1000 !important;
+                }
+
+                /* Gallery Modal - White Transparent Glassmorphism */
+                .gallery-modal {
+                    display: none;
+                    position: fixed;
+                    z-index: 10000;
+                    left: 0;
+                    top: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(255, 255, 255, 0.7);
+                    backdrop-filter: blur(16px);
+                    -webkit-backdrop-filter: blur(16px);
+                }
+
+                .gallery-modal-content {
+                    position: relative;
+                    margin: 1.5% auto;
+                    width: 94%;
+                    height: 94%;
+                    background: rgba(255, 255, 255, 0.98);
+                    backdrop-filter: blur(40px);
+                    -webkit-backdrop-filter: blur(40px);
+                    border-radius: 24px;
+                    overflow: hidden;
+                    border: 1px solid rgba(255, 255, 255, 0.8);
+                    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15),
+                                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+                    display: flex;
+                    flex-direction: column;
+                }
+
+                .gallery-modal-header {
+                    background: rgba(255, 255, 255, 0.6);
+                    backdrop-filter: blur(20px);
+                    -webkit-backdrop-filter: blur(20px);
+                    color: #1f2937;
+                    padding: 20px 28px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+                    flex-shrink: 0;
+                }
+
+                .gallery-modal-close {
+                    color: #4b5563;
+                    font-size: 28px;
+                    font-weight: 300;
+                    cursor: pointer;
+                    background: rgba(0, 0, 0, 0.04);
+                    border: none;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    line-height: 1;
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 12px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .gallery-modal-close:hover {
+                    background: rgba(239, 68, 68, 0.12);
+                    color: #ef4444;
+                    transform: scale(1.08);
+                }
+
+                .gallery-modal-body {
+                    flex: 1;
+                    background: rgba(249, 250, 251, 0.3);
+                    overflow: hidden;
+                    display: flex;
+                    flex-direction: column;
+                }
+
+                .gallery-main-display {
+                    flex: 1;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 20px;
+                    position: relative;
+                    overflow: hidden;
+                }
+
+                .gallery-main-display iframe {
+                    width: 100%;
+                    height: 100%;
+                    border: none;
+                    border-radius: 12px;
+                    background: white;
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+                }
+
+                .gallery-loading-text {
+                    text-align: center;
+                    padding: 60px 20px;
+                    color: #6b7280;
+                    font-size: 15px;
+                    font-weight: 500;
+                }
+
+                .drive-buttons {
+                    display: flex;
+                    gap: 8px;
+                    margin-top: 12px;
+                    flex-wrap: wrap;
+                }
+
+                .drive-btn {
+                    display: inline-block;
+                    padding: 10px 16px;
+                    background: rgba(255, 255, 255, 0.9);
+                    color: #3b82f6;
+                    text-decoration: none;
+                    border-radius: 12px;
+                    font-size: 12px;
+                    cursor: pointer;
+                    border: 1px solid rgba(59, 130, 246, 0.3);
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    font-weight: 600;
+                    font-family: 'Inter', sans-serif;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                }
+
+                .drive-btn:hover {
+                    background: #3b82f6;
+                    color: white;
+                    text-decoration: none;
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+                }
+
+                .drive-btn-gallery {
+                    background: rgba(255, 255, 255, 0.9);
+                    color: #a855f7;
+                    border-color: rgba(168, 85, 247, 0.3);
+                }
+
+                .drive-btn-gallery:hover {
+                    background: #a855f7;
+                    color: white;
+                    box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
+                }
+
+                /* Back button hover effect */
+                a[href="../"]:hover {
+                    background: rgba(255, 255, 255, 0.5) !important;
+                    border-color: rgba(255, 255, 255, 0.6) !important;
+                    transform: translateY(-2px) scale(1.1) !important;
+                    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
+                    animation: none !important;
+                }
+
+                /* Popup styles */
+                .leaflet-popup-content-wrapper {
+                    background: rgba(255, 255, 255, 0.3);
+                    backdrop-filter: blur(40px);
+                    -webkit-backdrop-filter: blur(40px);
+                    border-radius: 20px;
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                    font-family: 'Inter', sans-serif;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                }
+
+                .leaflet-popup-content-wrapper:hover {
+                    transform: translateY(-4px);
+                    background: rgba(255, 255, 255, 0.35);
+                    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+                }
+
+                .leaflet-popup-content {
+                    margin: 20px 22px;
+                    font-family: 'Inter', sans-serif;
+                }
+
+                .leaflet-popup-tip {
+                    background: rgba(255, 255, 255, 0.3);
+                    backdrop-filter: blur(40px);
+                    -webkit-backdrop-filter: blur(40px);
+                }
+
+                .leaflet-popup-close-button {
+                    color: #000000 !important;
+                    font-size: 24px !important;
+                    font-weight: 300 !important;
+                    padding: 4px 8px !important;
+                    width: 30px !important;
+                    height: 30px !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    top: 8px !important;
+                    right: 8px !important;
+                    border-radius: 8px !important;
+                    transition: all 0.3s ease !important;
+                    background: rgba(255, 255, 255, 0.2) !important;
+                    line-height: 1 !important;
+                }
+
+                .leaflet-popup-close-button:hover {
+                    background: rgba(255, 255, 255, 0.4) !important;
+                    transform: rotate(90deg) !important;
+                }
+
+                /* Hide Leaflet attribution */
+                .leaflet-control-attribution {
+                    display: none !important;
+                }
+
+                /* Interactive hover effects for UI elements */
+                #headerBox {
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                }
+
+                #headerBox:hover {
+                    transform: translateY(-4px);
+                    background: rgba(255, 255, 255, 0.3);
+                    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+                }
+
+                /* Legend and Map Controls hover */
+                #headerBox + a + div > div {
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                }
+
+                #headerBox + a + div > div:hover {
+                    transform: translateY(-4px);
+                    background: rgba(255, 255, 255, 0.3);
+                    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+                }
+
+                /* Search bar styles */
+                .search-wrapper {
+                    position: fixed;
+                    bottom: 20px;
+                    right: 20px;
+                    z-index: 9999;
+                }
+
+                .search-container {
+                    position: relative;
+                    background: rgba(255, 255, 255, 0.25);
+                    backdrop-filter: blur(40px);
+                    -webkit-backdrop-filter: blur(40px);
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                    border-radius: 20px;
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+                    padding: 12px 16px;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    font-family: 'Inter', sans-serif;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                }
+
+                .search-container:hover {
+                    transform: translateY(-4px);
+                    background: rgba(255, 255, 255, 0.3);
+                    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+                }
+
+                .search-input {
+                    background: rgba(255, 255, 255, 0.3);
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                    border-radius: 12px;
+                    padding: 10px 14px;
+                    font-size: 13px;
+                    font-family: 'Inter', sans-serif;
+                    font-weight: 600;
+                    color: #000000;
+                    width: 330px;
+                    outline: none;
+                    transition: all 0.3s ease;
+                }
+
+                .search-input::placeholder {
+                    color: rgba(0, 0, 0, 0.5);
+                    font-weight: 500;
+                }
+
+                .search-input:focus {
+                    background: rgba(255, 255, 255, 0.5);
+                    border-color: rgba(255, 255, 255, 0.5);
+                    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+                }
+
+                .search-button {
+                    background: rgba(255, 255, 255, 0.3);
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                    border-radius: 12px;
+                    padding: 10px 18px;
+                    font-size: 14px;
+                    font-family: 'Inter', sans-serif;
+                    font-weight: 700;
+                    color: #000000;
+                    cursor: pointer;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                }
+
+                .search-button:hover {
+                    background: rgba(255, 255, 255, 0.5);
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                }
+
+                .search-button:active {
+                    transform: translateY(0px);
+                }
+
+                /* Autocomplete suggestions */
+                .autocomplete-suggestions {
+                    position: absolute;
+                    top: calc(100% + 8px);
+                    left: 0;
+                    right: 50px;
+                    background: rgba(255, 255, 255, 0.95);
+                    backdrop-filter: blur(40px);
+                    -webkit-backdrop-filter: blur(40px);
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                    border-radius: 16px;
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+                    max-height: 300px;
+                    overflow-y: auto;
+                    display: none;
+                    z-index: 10000;
+                }
+
+                .autocomplete-suggestions.show {
+                    display: block;
+                }
+
+                .autocomplete-item {
+                    padding: 12px 16px;
+                    cursor: pointer;
+                    font-family: 'Inter', sans-serif;
+                    font-size: 13px;
+                    font-weight: 600;
+                    color: #000000;
+                    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+                    transition: all 0.2s ease;
+                }
+
+                .autocomplete-item:last-child {
+                    border-bottom: none;
+                }
+
+                .autocomplete-item:hover {
+                    background: rgba(59, 130, 246, 0.1);
+                }
+
+                .autocomplete-item i {
+                    margin-right: 8px;
+                    color: #3b82f6;
+                    font-size: 12px;
+                }
+
+                .search-container {
+                    position: relative;
+                }
+
+                /* Back button pulse animation */
+                @keyframes pulse {
+                    0%, 100% {
+                        transform: scale(1);
+                        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+                    }
+                    50% {
+                        transform: scale(1.08);
+                        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+                    }
+                }
+
+                a[href="../"] {
+                    animation: pulse 2s ease-in-out infinite;
+                }
+
+                /* Dropdown styles */
+                .property-list {
+                    max-height: 0;
+                    overflow: hidden;
+                    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                    margin-top: 0;
+                }
+
+                .property-list.expanded {
+                    max-height: 500px;
+                    margin-top: 16px;
+                    overflow-y: auto;
+                }
+
+                .property-list::-webkit-scrollbar {
+                    width: 6px;
+                }
+
+                .property-list::-webkit-scrollbar-track {
+                    background: rgba(0, 0, 0, 0.05);
+                    border-radius: 10px;
+                }
+
+                .property-list::-webkit-scrollbar-thumb {
+                    background: rgba(0, 0, 0, 0.2);
+                    border-radius: 10px;
+                }
+
+                .property-list::-webkit-scrollbar-thumb:hover {
+                    background: rgba(0, 0, 0, 0.3);
+                }
+
+                .property-item {
+                    padding: 12px 14px;
+                    margin: 8px 0;
+                    background: rgba(255, 255, 255, 0.15);
+                    border-radius: 12px;
+                    font-size: 13px;
+                    color: #000000;
+                    cursor: pointer;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    border: 1px solid rgba(0, 0, 0, 0.1);
+                    position: relative;
+                    overflow: hidden;
+                }
+
+                .property-item::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: -100%;
+                    width: 100%;
+                    height: 100%;
+                    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+                    transition: left 0.5s ease;
+                }
+
+                .property-item:hover::before {
+                    left: 100%;
+                }
+
+                .property-item:hover {
+                    background: rgba(255, 255, 255, 0.35);
+                    transform: translateX(8px) translateY(-2px);
+                    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+                    border-color: rgba(255, 255, 255, 0.3);
+                }
+
+                .property-item:active {
+                    transform: translateX(6px) translateY(0px);
+                    transition: all 0.1s ease;
+                }
+
+                .property-number {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 24px;
+                    height: 24px;
+                    background: white;
+                    color: #000000;
+                    border-radius: 50%;
+                    font-weight: 800;
+                    font-size: 13px;
+                    margin-right: 10px;
+                    border: 2px solid #000000;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                }
+
+                .property-item:hover .property-number {
+                    transform: scale(1.15) rotate(360deg);
+                    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+                    background: #000000;
+                    color: white;
+                }
+
+                .toggle-arrow {
+                    display: inline-block;
+                    margin-left: 8px;
+                    transition: transform 0.3s ease;
+                    font-size: 12px;
+                    font-weight: 700;
+                }
+
+                .toggle-arrow.expanded {
+                    transform: rotate(90deg);
+                }
+
+                .header-clickable {
+                    cursor: pointer;
+                    user-select: none;
+                }
+
+                .header-clickable:hover {
+                    opacity: 0.8;
+                }
+
+                /* Glassmorphism Curtain Effect */
+                .curtain-overlay {
+                    position: fixed;
+                    top: 0;
+                    bottom: 0;
+                    width: 50%;
+                    z-index: 10001;
+                    pointer-events: none;
+                    transition: transform 1.5s cubic-bezier(0.65, 0, 0.35, 1);
+                    will-change: transform;
+                }
+
+                .curtain-left {
+                    left: 0;
+                    background: linear-gradient(135deg,
+                        rgba(181, 168, 196, 0.98) 0%,
+                        rgba(157, 143, 170, 0.99) 50%,
+                        rgba(168, 155, 176, 0.98) 100%);
+                    backdrop-filter: blur(60px) saturate(180%);
+                    -webkit-backdrop-filter: blur(60px) saturate(180%);
+                    border-right: 1px solid rgba(255, 255, 255, 0.4);
+                    box-shadow:
+                        4px 0 60px rgba(181, 168, 196, 0.5),
+                        inset -1px 0 0 rgba(255, 255, 255, 0.5);
+                    transform-origin: left center;
+                }
+
+                .curtain-right {
+                    right: 0;
+                    background: linear-gradient(135deg,
+                        rgba(168, 155, 176, 0.98) 0%,
+                        rgba(157, 143, 170, 0.99) 50%,
+                        rgba(181, 168, 196, 0.98) 100%);
+                    backdrop-filter: blur(60px) saturate(180%);
+                    -webkit-backdrop-filter: blur(60px) saturate(180%);
+                    border-left: 1px solid rgba(255, 255, 255, 0.4);
+                    box-shadow:
+                        -4px 0 60px rgba(168, 155, 176, 0.5),
+                        inset 1px 0 0 rgba(255, 255, 255, 0.5);
+                    transform-origin: right center;
+                }
+
+                .curtain-left::before,
+                .curtain-right::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    bottom: 0;
+                    width: 100%;
+                    background: linear-gradient(90deg,
+                        transparent 0%,
+                        rgba(255, 255, 255, 0.15) 50%,
+                        transparent 100%);
+                    animation: shimmer 2s ease-in-out;
+                    pointer-events: none;
+                }
+
+                .curtain-left::after,
+                .curtain-right::after {
+                    content: '';
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    width: 200px;
+                    height: 200px;
+                    background: radial-gradient(circle,
+                        rgba(255, 255, 255, 0.25) 0%,
+                        transparent 70%);
+                    border-radius: 50%;
+                    filter: blur(40px);
+                    animation: glow 1.5s ease-in-out;
+                    pointer-events: none;
+                }
+
+                .curtain-overlay.open.curtain-left {
+                    transform: translateX(-102%) rotateY(5deg) scale(1.02);
+                }
+
+                .curtain-overlay.open.curtain-right {
+                    transform: translateX(102%) rotateY(-5deg) scale(1.02);
+                }
+
+                .curtain-overlay.curtain-left:not(.open) {
+                    transform: translateX(0%) rotateY(0deg) scale(1);
+                }
+
+                .curtain-overlay.curtain-right:not(.open) {
+                    transform: translateX(0%) rotateY(0deg) scale(1);
+                }
+
+                @keyframes shimmer {
+                    0% {
+                        transform: translateX(-100%);
+                        opacity: 0;
+                    }
+                    50% {
+                        opacity: 1;
+                    }
+                    100% {
+                        transform: translateX(100%);
+                        opacity: 0;
+                    }
+                }
+
+                @keyframes glow {
+                    0% {
+                        opacity: 0;
+                        transform: translate(-50%, -50%) scale(0.8);
+                    }
+                    50% {
+                        opacity: 1;
+                        transform: translate(-50%, -50%) scale(1.2);
+                    }
+                    100% {
+                        opacity: 0;
+                        transform: translate(-50%, -50%) scale(1);
+                    }
+                }
+
+                .curtain-center {
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    z-index: 10002;
+                    pointer-events: none;
+                    width: 3px;
+                    height: 100%;
+                    background: linear-gradient(to bottom,
+                        transparent 0%,
+                        rgba(255, 255, 255, 0.7) 20%,
+                        rgba(255, 255, 255, 0.9) 50%,
+                        rgba(255, 255, 255, 0.7) 80%,
+                        transparent 100%);
+                    box-shadow:
+                        0 0 25px rgba(255, 255, 255, 0.9),
+                        0 0 50px rgba(181, 168, 196, 0.7),
+                        0 0 75px rgba(157, 143, 170, 0.5);
+                    opacity: 1;
+                    transition: opacity 1.2s ease-out 0.3s;
+                }
+
+                .curtain-center.fade-out {
+                    opacity: 0;
+                }
+
+                .curtain-overlay.fade {
+                    opacity: 0;
+                    transition: transform 1.5s cubic-bezier(0.65, 0, 0.35, 1),
+                                opacity 0.5s ease-out 1.0s;
+                }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@3.0.0/Control.FullScreen.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@3.0.0/Control.FullScreen.css"/>
+</head>
+<body>
+    <!-- Glassmorphism Curtain Effect -->
+    <div class="curtain-center"></div>
+    <div class="curtain-overlay curtain-left"></div>
+    <div class="curtain-overlay curtain-right"></div>
+
+    <!-- Gallery Modal -->
+    <div id="galleryModal" class="gallery-modal">
+        <div class="gallery-modal-content">
+            <div class="gallery-modal-header">
+                <h3 id="modalTitle" style="margin: 0; font-weight: 700; font-size: 18px; letter-spacing: -0.02em;">Property Photos</h3>
+                <button class="gallery-modal-close" onclick="closeGallery()">&times;</button>
+            </div>
+            <div class="gallery-modal-body">
+                <div class="gallery-main-display" id="galleryMainDisplay">
+                    <div class="gallery-loading-text">Loading gallery...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="headerBox" style="position: fixed;
+                top: 16px;
+                left: 50px;
+                width: 540px;
+                background: rgba(255, 255, 255, 0.25);
+                backdrop-filter: blur(40px);
+                -webkit-backdrop-filter: blur(40px);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                z-index: 9999;
+                padding: 20px 24px;
+                border-radius: 20px;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+                font-family: 'Inter', sans-serif;">
+        <div class="header-clickable" onclick="togglePropertyList()">
+            <h3 style="margin: 0 0 8px 0; color: #000000; font-size: 20px; font-weight: 700; letter-spacing: -0.01em;">Deepblue Capital Partners</h3>
+            <h4 style="margin: 0 0 8px 0; color: #000000; font-size: 16px; font-weight: 600;">Willow Ridge Tour</h4>
+            <p style="margin: 0; font-size: 13px; color: #000000; font-weight: 600;">
+                📅 11.20.25 - 11.21.25 · 📍 6 Properties
+                <span class="toggle-arrow" id="toggleArrow">→</span>
+            </p>
+        </div>
+        <div class="property-list" id="propertyList">
+            <div class="property-item" onclick="focusMarker(1)">
+                <span class="property-number">1</span>Willow Ridge Townhomes (11.21)
+            </div>
+            <div class="property-item" onclick="focusMarker(2)">
+                <span class="property-number">2</span>Willow Ridge Townhomes (11.20)
+            </div>
+            <div class="property-item" onclick="focusMarker(3)">
+                <span class="property-number">3</span>Park Place Townhomes
+            </div>
+            <div class="property-item" onclick="focusMarker(4)">
+                <span class="property-number">4</span>Huntington Glen
+            </div>
+            <div class="property-item" onclick="focusMarker(5)">
+                <span class="property-number">5</span>Harwood Hills
+            </div>
+            <div class="property-item" onclick="focusMarker(6)">
+                <span class="property-number">6</span>3001 Crystal Springs
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Home Button -->
+    <a href="../" style="position: fixed;
+                top: 16px;
+                right: 16px;
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 40px;
+                height: 40px;
+                background: rgba(255, 255, 255, 0.35);
+                backdrop-filter: blur(40px);
+                -webkit-backdrop-filter: blur(40px);
+                border: 2px solid rgba(255, 255, 255, 0.4);
+                border-radius: 50%;
+                color: #000000;
+                text-decoration: none;
+                font-size: 18px;
+                font-weight: 600;
+                font-family: 'Inter', sans-serif;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+                cursor: pointer;">
+        ←
+    </a>
+
+    <!-- Legend and Map Controls -->
+    <div style="position: fixed;
+                bottom: 20px;
+                left: 20px;
+                z-index: 9999;
+                display: flex;
+                gap: 12px;
+                font-family: 'Inter', sans-serif;">
+
+        <!-- Legend -->
+        <div style="width: 200px;
+                    background: rgba(255, 255, 255, 0.25);
+                    backdrop-filter: blur(40px);
+                    -webkit-backdrop-filter: blur(40px);
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                    padding: 18px 20px;
+                    border-radius: 20px;
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.4);">
+            <h4 style="margin: 0 0 12px 0; color: #000000; font-size: 14px; font-weight: 700; letter-spacing: -0.01em;">Legend</h4>
+            <p style="margin: 0; font-size: 13px; color: #000000; line-height: 1.8; font-weight: 600;">
+                <span style="color: #3b82f6; font-size: 16px;">●</span> Photos Only<br>
+                <span style="color: #f59e0b; font-size: 16px;">●</span> Videos Only<br>
+                <span style="color: #a855f7; font-size: 16px;">●</span> Photos + Videos
+            </p>
+        </div>
+
+        <!-- Map Controls -->
+        <div id="mapControls" style="width: 200px;
+                    background: rgba(255, 255, 255, 0.25);
+                    backdrop-filter: blur(40px);
+                    -webkit-backdrop-filter: blur(40px);
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                    padding: 18px 20px;
+                    border-radius: 20px;
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.4);">
+            <h4 style="margin: 0 0 12px 0; color: #000000; font-size: 14px; font-weight: 700; letter-spacing: -0.01em;">Map View</h4>
+
+            <!-- Layer Switcher -->
+            <div style="margin-bottom: 16px;">
+                <p style="margin: 0 0 8px 0; font-size: 12px; color: #000000; font-weight: 600; opacity: 0.7;">Base Layer</p>
+                <select id="layerSelector" onchange="switchMapLayer(this.value)" style="width: 100%;
+                        padding: 8px 12px;
+                        border-radius: 10px;
+                        border: 1px solid rgba(0, 0, 0, 0.15);
+                        background: rgba(255, 255, 255, 0.9);
+                        color: #000000;
+                        font-size: 13px;
+                        font-weight: 600;
+                        font-family: 'Inter', sans-serif;
+                        cursor: pointer;
+                        transition: all 0.3s;">
+                    <option value="roadmap">Roadmap</option>
+                    <option value="hybrid">Satellite</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-wrapper">
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search location or address..." oninput="handleSearchInput()" onkeypress="if(event.key==='Enter') searchLocation()" onfocus="showSuggestions()" autocomplete="off">
+            <button onclick="searchLocation()" class="search-button">
+                <i class="fa fa-search"></i>
+            </button>
+            <div id="suggestions" class="autocomplete-suggestions"></div>
+        </div>
+    </div>
+
+
+            <div class="folium-map" id="map" ></div>
+
+</body>
+<script>
+    // Map layer control variables
+    let currentGoogleLayer = null;
+
+    // Gallery modal functions
+    function openGallery(folderId, propertyName) {
+        const modal = document.getElementById('galleryModal');
+        const title = document.getElementById('modalTitle');
+        const mainDisplay = document.getElementById('galleryMainDisplay');
+
+        // Set title and show modal
+        title.textContent = propertyName;
+        modal.style.display = 'block';
+
+        // Clear and create iframe for folder view
+        mainDisplay.innerHTML = '';
+
+        const folderFrame = document.createElement('iframe');
+        folderFrame.src = `https://drive.google.com/embeddedfolderview?id=${folderId}#grid`;
+        folderFrame.allow = 'autoplay';
+        mainDisplay.appendChild(folderFrame);
+    }
+
+    function closeGallery() {
+        const modal = document.getElementById('galleryModal');
+        const mainDisplay = document.getElementById('galleryMainDisplay');
+
+        modal.style.display = 'none';
+        mainDisplay.innerHTML = '<div class="gallery-loading-text">Loading gallery...</div>';
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('galleryModal');
+        if (event.target === modal) {
+            closeGallery();
+        }
+    };
+
+    // Keyboard shortcut to close
+    document.addEventListener('keydown', function(event) {
+        const modal = document.getElementById('galleryModal');
+        if (modal.style.display === 'block' && event.key === 'Escape') {
+            closeGallery();
+        }
+    });
+
+    // Toggle property list dropdown
+    function togglePropertyList() {
+        const list = document.getElementById('propertyList');
+        const arrow = document.getElementById('toggleArrow');
+        list.classList.toggle('expanded');
+        arrow.classList.toggle('expanded');
+    }
+
+    // Auto-expand property list after 2 seconds
+    setTimeout(() => {
+        togglePropertyList();
+    }, 2000);
+
+    // Store marker references
+    var markerReferences = {};
+
+    // Property data with addresses to be geocoded
+    const properties = [
+        {
+            num: 1,
+            name: "Willow Ridge Townhomes (11.21.25)",
+            address: "1050 W Ash Ln, Euless, TX 76039",
+            folderId: "1O77OJj_3P5GzwFtxxvOfR8pCLuafbBPP",
+            color: "#a855f7",
+            date: "November 21, 2025",
+            city: "Euless, TX 76039"
+        },
+        {
+            num: 2,
+            name: "Willow Ridge Townhomes (11.20.25)",
+            address: "1050 W Ash Ln, Euless, TX 76039",
+            folderId: "1YB8-RuUZmrdTVwkV5CnxQAJxfo6GWc0Y",
+            color: "#a855f7",
+            date: "November 20, 2025",
+            city: "Euless, TX 76039"
+        },
+        {
+            num: 3,
+            name: "Park Place Townhomes",
+            address: "425 E Harwood Rd, Euless, TX 76039",
+            folderId: "1dYqwo0GB9NxXT10-fXQacmW0iloFQXLJ",
+            color: "#a855f7",
+            date: "November 21, 2025",
+            city: "Euless, TX 76039"
+        },
+        {
+            num: 4,
+            name: "Huntington Glen",
+            address: "2900 Harwood Rd, Bedford, TX 76021",
+            folderId: "1RzgaT2MFPtDBvny3vYoS8RU8XhWWkBpJ",
+            color: "#a855f7",
+            date: "November 20, 2025",
+            city: "Bedford, TX 76021"
+        },
+        {
+            num: 5,
+            name: "Harwood Hills",
+            address: "2452 Highway 121, Bedford, TX 76021",
+            folderId: "1zf4sDbP8xIPHoQDeCEtt0iUJ1HTsXb9J",
+            color: "#a855f7",
+            date: "November 21, 2025",
+            city: "Bedford, TX 76021"
+        },
+        {
+            num: 6,
+            name: "3001 Crystal Springs",
+            address: "3001 Crystal Springs St, Bedford, TX 76021",
+            folderId: "1Kdv0qVCrVQzxUK1QbcOQ5GlFeEqcDaDt",
+            color: "#a855f7",
+            date: "November 21, 2025",
+            city: "Bedford, TX 76021"
+        }
+    ];
+
+    var map = L.map(
+        "map",
+        {
+            center: [32.8451, -97.0819],
+            crs: L.CRS.EPSG3857,
+            zoom: 13,
+            zoomControl: true,
+            preferCanvas: false
+        }
+    );
+
+    // Initialize with roadmap layer
+    currentGoogleLayer = L.gridLayer.googleMutant({
+        type: 'roadmap',
+        maxZoom: 21
+    });
+
+    currentGoogleLayer.addTo(map);
+
+    // Load Google Maps API and geocode properties
+    var script = document.createElement('script');
+    script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyCSbLWOtlLpFN4pQuuaTnr3-e48oE1fN-o';
+    script.onload = function() {
+        const geocoder = new google.maps.Geocoder();
+        let geocodedCount = 0;
+
+        properties.forEach((property) => {
+            geocoder.geocode({ address: property.address }, function(results, status) {
+                if (status === 'OK' && results[0]) {
+                    const location = results[0].geometry.location;
+                    const lat = location.lat();
+                    const lng = location.lng();
+
+                    createMarker(property, lat, lng);
+
+                    geocodedCount++;
+                    if (geocodedCount === properties.length) {
+                        // All markers created, fit bounds
+                        const group = L.featureGroup(Object.values(markerReferences));
+                        map.fitBounds(group.getBounds().pad(0.1));
+                    }
+                }
+            });
+        });
+    };
+    document.head.appendChild(script);
+
+    function createMarker(property, lat, lng) {
+        const marker = L.marker([lat, lng], {}).addTo(map);
+
+        const icon = L.AwesomeMarkers.icon({
+            markerColor: "white",
+            iconColor: property.color,
+            icon: "star",
+            prefix: "fa",
+            extraClasses: "fa-rotate-0"
+        });
+
+        const popup = L.popup({ maxWidth: 350 });
+
+        const html = $(`<div style="width: 100.0%; height: 100.0%;">
+    <div style="width: 300px; font-family: 'Inter', sans-serif;">
+        <h4 style="margin: 0 0 12px 0; color: #000000; font-weight: 700; font-size: 18px;">${property.name}</h4>
+        <p style="margin: 5px 0; font-weight: 600; color: #000000;">${property.address.split(',')[0]}</p>
+        <p style="margin: 5px 0; font-size: 13px; color: #000000; opacity: 0.7;">${property.city}</p>
+        <hr style="margin: 12px 0; border: none; border-top: 1px solid rgba(0,0,0,0.15);">
+        <p style="margin: 8px 0; font-size: 12px; color: #000000; opacity: 0.8; line-height: 1.6;">
+            📅 ${property.date}<br>
+        </p>
+        <a href="https://www.google.com/maps?q=${lat},${lng}" target="_blank" style="font-size: 12px; color: #3b82f6; font-weight: 600; text-decoration: none;">
+            📍 View on Google Maps
+        </a>
+
+        <div class="drive-buttons">
+            <a href="https://drive.google.com/drive/folders/${property.folderId}" target="_blank" class="drive-btn">
+                📁 Open Folder
+            </a>
+            <button onclick="openGallery('${property.folderId}', '${property.name}')" class="drive-btn drive-btn-gallery">
+                🖼️ View Gallery
+            </button>
+        </div>
+
+    </div>
+</div>`)[0];
+        popup.setContent(html);
+
+        marker.bindPopup(popup);
+        marker.bindTooltip(`<div>${property.name}</div>`, { sticky: true });
+        marker.setIcon(icon);
+
+        const circle_marker = L.circleMarker(
+            [lat, lng],
+            {"bubblingMouseEvents": true, "color": property.color, "dashArray": null, "dashOffset": null, "fill": true, "fillColor": property.color, "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
+        ).addTo(map);
+
+        const marker_label = L.marker(
+            [lat, lng],
+            {"interactive": false}
+        ).addTo(map);
+
+        const div_icon = L.divIcon({
+            html: `<div>${property.num}</div>`,
+            className: "empty"
+        });
+
+        marker_label.setIcon(div_icon);
+        markerReferences[property.num] = marker;
+    }
+
+    // Focus marker function - zoom to marker and open popup
+    function focusMarker(num) {
+        const marker = markerReferences[num];
+        if (marker) {
+            // Center the marker on screen with smooth animation
+            map.setView(marker.getLatLng(), 16, {
+                animate: true,
+                pan: {
+                    duration: 0.5
+                }
+            });
+            // Open popup after animation
+            setTimeout(() => {
+                marker.openPopup();
+            }, 500);
+        }
+    }
+
+    // Autocomplete service
+    let autocompleteService;
+    let placesService;
+    let searchTimeout;
+
+    // Initialize autocomplete service when Google Maps loads
+    setTimeout(() => {
+        if (typeof google !== 'undefined') {
+            autocompleteService = new google.maps.places.AutocompleteService();
+            placesService = new google.maps.places.PlacesService(document.createElement('div'));
+        }
+    }, 2000);
+
+    // Handle search input with autocomplete
+    function handleSearchInput() {
+        const input = document.getElementById('searchInput');
+        const suggestionsDiv = document.getElementById('suggestions');
+        const query = input.value.trim();
+
+        clearTimeout(searchTimeout);
+
+        if (query.length < 2) {
+            suggestionsDiv.classList.remove('show');
+            return;
+        }
+
+        searchTimeout = setTimeout(() => {
+            if (autocompleteService) {
+                autocompleteService.getPlacePredictions({
+                    input: query,
+                    types: ['geocode', 'establishment']
+                }, displaySuggestions);
+            }
+        }, 300);
+    }
+
+    // Display autocomplete suggestions
+    function displaySuggestions(predictions, status) {
+        const suggestionsDiv = document.getElementById('suggestions');
+
+        if (status !== google.maps.places.PlacesServiceStatus.OK || !predictions) {
+            suggestionsDiv.classList.remove('show');
+            return;
+        }
+
+        suggestionsDiv.innerHTML = '';
+        predictions.slice(0, 5).forEach(prediction => {
+            const item = document.createElement('div');
+            item.className = 'autocomplete-item';
+            item.innerHTML = `<i class="fa fa-map-marker"></i>${prediction.description}`;
+            item.onclick = () => selectSuggestion(prediction.description);
+            suggestionsDiv.appendChild(item);
+        });
+
+        suggestionsDiv.classList.add('show');
+    }
+
+    // Select a suggestion
+    function selectSuggestion(address) {
+        const input = document.getElementById('searchInput');
+        const suggestionsDiv = document.getElementById('suggestions');
+
+        input.value = address;
+        suggestionsDiv.classList.remove('show');
+        searchLocation();
+    }
+
+    // Show suggestions on focus
+    function showSuggestions() {
+        const input = document.getElementById('searchInput');
+        if (input.value.trim().length >= 2) {
+            handleSearchInput();
+        }
+    }
+
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', function(e) {
+        const suggestionsDiv = document.getElementById('suggestions');
+        const searchInput = document.getElementById('searchInput');
+
+        if (!e.target.closest('.search-container')) {
+            suggestionsDiv.classList.remove('show');
+        }
+    });
+
+    // Search location function
+    function searchLocation() {
+        const searchInput = document.getElementById('searchInput');
+        const suggestionsDiv = document.getElementById('suggestions');
+        const query = searchInput.value.trim();
+
+        suggestionsDiv.classList.remove('show');
+
+        if (!query) {
+            alert('Please enter a location or address to search');
+            return;
+        }
+
+        // Use Google Geocoding API
+        const geocoder = new google.maps.Geocoder();
+
+        geocoder.geocode({ address: query }, function(results, status) {
+            if (status === 'OK' && results[0]) {
+                const location = results[0].geometry.location;
+                const lat = location.lat();
+                const lng = location.lng();
+
+                // Pan and zoom to the location
+                map.setView([lat, lng], 16);
+
+                // Add a temporary marker
+                const searchMarker = L.marker([lat, lng]).addTo(map);
+                searchMarker.bindPopup(`<div style="font-family: 'Inter', sans-serif; font-weight: 600; color: #000000;">
+                    <strong>${results[0].formatted_address}</strong>
+                </div>`).openPopup();
+
+                // Remove the marker after 5 seconds
+                setTimeout(() => {
+                    map.removeLayer(searchMarker);
+                }, 5000);
+            } else {
+                alert('Location not found. Please try a different search term.');
+            }
+        });
+    }
+
+    // Switch map layer function
+    function switchMapLayer(layerType) {
+        // Remove current layer
+        if (currentGoogleLayer) {
+            map.removeLayer(currentGoogleLayer);
+        }
+
+        // Add new layer
+        currentGoogleLayer = L.gridLayer.googleMutant({
+            type: layerType,
+            maxZoom: 21
+        });
+        currentGoogleLayer.addTo(map);
+    }
+
+
+    L.control.fullscreen({
+        position: 'topleft',
+        title: 'Enter fullscreen mode',
+        titleCancel: 'Exit fullscreen mode',
+        forceSeparateButton: true
+    }).addTo(map);
+
+    // Curtain reveal effect on page load
+    window.addEventListener('load', function() {
+        setTimeout(function() {
+            const curtainLeft = document.querySelector('.curtain-left');
+            const curtainRight = document.querySelector('.curtain-right');
+            const curtainCenter = document.querySelector('.curtain-center');
+
+            // Add open class to trigger sliding animation
+            curtainLeft.classList.add('open');
+            curtainRight.classList.add('open');
+
+            // Add fade class for smooth exit after sliding
+            setTimeout(function() {
+                curtainLeft.classList.add('fade');
+                curtainRight.classList.add('fade');
+            }, 50);
+
+            // Fade out center line
+            setTimeout(function() {
+                curtainCenter.classList.add('fade-out');
+            }, 200);
+
+            // Remove curtain elements after animation completes
+            setTimeout(function() {
+                curtainLeft.remove();
+                curtainRight.remove();
+                curtainCenter.remove();
+            }, 2000);
+        }, 100);
+    });
+
+    // Curtain closing effect when clicking back button
+    document.addEventListener('DOMContentLoaded', function() {
+        const backButton = document.querySelector('a[href="../"]');
+
+        if (backButton) {
+            backButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetUrl = this.href;
+
+                // Create curtain elements
+                const curtainCenter = document.createElement('div');
+                curtainCenter.className = 'curtain-center fade-out';
+
+                const curtainLeft = document.createElement('div');
+                curtainLeft.className = 'curtain-overlay curtain-left open';
+
+                const curtainRight = document.createElement('div');
+                curtainRight.className = 'curtain-overlay curtain-right open';
+
+                // Add to body
+                document.body.appendChild(curtainCenter);
+                document.body.appendChild(curtainLeft);
+                document.body.appendChild(curtainRight);
+
+                // Trigger reflow
+                curtainLeft.offsetHeight;
+
+                // Remove open class to close curtains (slide them to center)
+                setTimeout(function() {
+                    curtainLeft.classList.remove('open');
+                    curtainRight.classList.remove('open');
+                    curtainCenter.classList.remove('fade-out');
+                }, 50);
+
+                // Navigate after animation
+                setTimeout(function() {
+                    window.location.href = targetUrl;
+                }, 1600);
+            });
+        }
+    });
+
+</script>
+</html>

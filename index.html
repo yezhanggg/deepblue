@@ -134,6 +134,138 @@
             padding: 0 8px;
         }
 
+        /* Filter Section Styles */
+        .filter-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+
+        .filter-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.8);
+            letter-spacing: 0.02em;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 12px;
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            color: #ffffff;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            min-width: 120px;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='white' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+        }
+
+        .filter-select:hover {
+            background: rgba(255, 255, 255, 0.22);
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-select:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15);
+        }
+
+        .filter-select option {
+            background: #9d8faa;
+            color: #ffffff;
+            padding: 10px;
+        }
+
+        .filter-reset {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filter-reset:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.35);
+        }
+
+        .filter-count {
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.6);
+            margin-left: auto;
+        }
+
+        .project-card.hidden {
+            display: none;
+        }
+
+        .no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        @media (max-width: 680px) {
+            .filter-section {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .filter-group {
+                width: 100%;
+            }
+
+            .filter-select {
+                flex: 1;
+                min-width: 0;
+            }
+
+            .filter-count {
+                margin-left: 0;
+                width: 100%;
+                text-align: center;
+                margin-top: 8px;
+            }
+        }
+
         .projects {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
@@ -490,27 +622,83 @@
         <div class="content">
             <div class="section-title">Property Tours</div>
 
-            <div class="projects">
-                <a href="summercrest/" class="project-card">
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <span class="filter-label">Filter by:</span>
+                <div class="filter-group">
+                    <select id="yearFilter" class="filter-select" onchange="filterTours()">
+                        <option value="">All Years</option>
+                        <option value="2025">2025</option>
+                    </select>
+                    <select id="monthFilter" class="filter-select" onchange="filterTours()">
+                        <option value="">All Months</option>
+                        <option value="01">January</option>
+                        <option value="02">February</option>
+                        <option value="03">March</option>
+                        <option value="04">April</option>
+                        <option value="05">May</option>
+                        <option value="06">June</option>
+                        <option value="07">July</option>
+                        <option value="08">August</option>
+                        <option value="09">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                    </select>
+                    <button class="filter-reset" onclick="resetFilters()">
+                        <span>Reset</span>
+                    </button>
+                </div>
+                <span id="filterCount" class="filter-count">Showing all tours</span>
+            </div>
+
+            <div class="projects" id="projectsGrid">
+                <a href="willowridge-1122/" class="project-card" data-year="2025" data-month="11">
+                    <div class="project-tag">Tour</div>
+                    <h2>Willow Ridge Tour</h2>
+                    <p>DFW &ndash; 11.20.25 - 11.21.25</p>
+                    <span class="project-link">View Tour</span>
+                </a>
+
+                <a href="summercrest-1122/" class="project-card" data-year="2025" data-month="11">
+                    <div class="project-tag">Tour</div>
+                    <h2>Summercrest Village Duplexes Tour</h2>
+                    <p>DFW &ndash; 11.22.25</p>
+                    <span class="project-link">View Tour</span>
+                </a>
+
+                <a href="summercrest-nov19/" class="project-card" data-year="2025" data-month="11">
+                    <div class="project-tag">Tour</div>
+                    <h2>Summercrest Village Duplexes Tour</h2>
+                    <p>DFW &ndash; 11.19.25</p>
+                    <span class="project-link">View Tour</span>
+                </a>
+
+                <a href="summercrest/" class="project-card" data-year="2025" data-month="11">
                     <div class="project-tag">Tour</div>
                     <h2>Summercrest Village Duplexes Tour</h2>
                     <p>DFW &ndash; 11.6.25</p>
                     <span class="project-link">View Tour</span>
                 </a>
 
-                <a href="willow-ridge/" class="project-card">
+                <a href="willow-ridge/" class="project-card" data-year="2025" data-month="10">
                     <div class="project-tag">Tour</div>
                     <h2>Willow Ridge Comps Tour</h2>
                     <p>DFW &ndash; 10.29.25 &ndash; 10.30.25</p>
                     <span class="project-link">View Tour</span>
                 </a>
 
-                <a href="flintridge/" class="project-card">
+                <a href="flintridge/" class="project-card" data-year="2025" data-month="10">
                     <div class="project-tag">Tour</div>
                     <h2>Flintridge Apartment Comps Tour</h2>
                     <p>DFW &ndash; 10.7.25</p>
                     <span class="project-link">View Tour</span>
                 </a>
+
+                <!-- No results message -->
+                <div id="noResults" class="no-results" style="display: none;">
+                    No tours found for the selected filters.
+                </div>
 
                 <!-- Add more property tours here -->
             </div>
@@ -595,6 +783,73 @@
                 });
             });
         });
+
+        // Filter functionality
+        function filterTours() {
+            const yearFilter = document.getElementById('yearFilter').value;
+            const monthFilter = document.getElementById('monthFilter').value;
+            const projectCards = document.querySelectorAll('.project-card');
+            const noResults = document.getElementById('noResults');
+            const filterCount = document.getElementById('filterCount');
+
+            let visibleCount = 0;
+            const totalCount = projectCards.length;
+
+            projectCards.forEach(function(card) {
+                const cardYear = card.getAttribute('data-year');
+                const cardMonth = card.getAttribute('data-month');
+
+                let showCard = true;
+
+                // Check year filter
+                if (yearFilter && cardYear !== yearFilter) {
+                    showCard = false;
+                }
+
+                // Check month filter
+                if (monthFilter && cardMonth !== monthFilter) {
+                    showCard = false;
+                }
+
+                if (showCard) {
+                    card.classList.remove('hidden');
+                    visibleCount++;
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+
+            // Show/hide no results message
+            if (visibleCount === 0) {
+                noResults.style.display = 'block';
+            } else {
+                noResults.style.display = 'none';
+            }
+
+            // Update filter count text
+            if (yearFilter === '' && monthFilter === '') {
+                filterCount.textContent = 'Showing all tours';
+            } else {
+                const monthNames = ['', 'January', 'February', 'March', 'April', 'May', 'June',
+                                   'July', 'August', 'September', 'October', 'November', 'December'];
+                let filterText = 'Showing ' + visibleCount + ' of ' + totalCount + ' tours';
+
+                if (monthFilter) {
+                    filterText += ' in ' + monthNames[parseInt(monthFilter)];
+                }
+                if (yearFilter) {
+                    filterText += ' ' + yearFilter;
+                }
+
+                filterCount.textContent = filterText;
+            }
+        }
+
+        function resetFilters() {
+            document.getElementById('yearFilter').value = '';
+            document.getElementById('monthFilter').value = '';
+            filterTours();
+        }
     </script>
 </body>
 </html>

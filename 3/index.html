@@ -2,6 +2,45 @@
 <html>
 <head>
 
+    <script>
+        (function() {
+            const ACCESS_HASH = '5a0a428d869de24f31def000de2519b2b80fb9c75f08e7db2ecd14a4444bcdda';
+            const SESSION_KEY = 'deepblue:session:v1';
+            const ROOT_KEY = 'deepblue:root';
+
+            function deriveRootPath() {
+                try {
+                    const storedRoot = sessionStorage.getItem(ROOT_KEY);
+                    if (storedRoot) {
+                        return storedRoot;
+                    }
+                } catch (err) {
+                    /* storage unavailable, fall through */
+                }
+
+                const segments = window.location.pathname.split('/').filter(Boolean);
+                if (segments.length > 1) {
+                    return '/' + segments.slice(0, -1).join('/') + '/';
+                }
+                return '/';
+            }
+
+            try {
+                const token = sessionStorage.getItem(SESSION_KEY);
+                if (token !== ACCESS_HASH) {
+                    const rootPath = deriveRootPath();
+                    const destination = rootPath.startsWith('http')
+                        ? rootPath
+                        : window.location.origin + rootPath;
+                    window.location.replace(destination);
+                }
+            } catch (err) {
+                const rootPath = deriveRootPath();
+                window.location.replace(rootPath.startsWith('http') ? rootPath : window.location.origin + rootPath);
+            }
+        })();
+    </script>
+
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>

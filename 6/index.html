@@ -2,6 +2,45 @@
 <html>
 <head>
 
+    <script>
+        (function() {
+            const ACCESS_HASH = '5a0a428d869de24f31def000de2519b2b80fb9c75f08e7db2ecd14a4444bcdda';
+            const SESSION_KEY = 'deepblue:session:v1';
+            const ROOT_KEY = 'deepblue:root';
+
+            function deriveRootPath() {
+                try {
+                    const storedRoot = sessionStorage.getItem(ROOT_KEY);
+                    if (storedRoot) {
+                        return storedRoot;
+                    }
+                } catch (err) {
+                    /* storage unavailable, fall through */
+                }
+
+                const segments = window.location.pathname.split('/').filter(Boolean);
+                if (segments.length > 1) {
+                    return '/' + segments.slice(0, -1).join('/') + '/';
+                }
+                return '/';
+            }
+
+            try {
+                const token = sessionStorage.getItem(SESSION_KEY);
+                if (token !== ACCESS_HASH) {
+                    const rootPath = deriveRootPath();
+                    const destination = rootPath.startsWith('http')
+                        ? rootPath
+                        : window.location.origin + rootPath;
+                    window.location.replace(destination);
+                }
+            } catch (err) {
+                const rootPath = deriveRootPath();
+                window.location.replace(rootPath.startsWith('http') ? rootPath : window.location.origin + rootPath);
+            }
+        })();
+    </script>
+
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -468,7 +507,7 @@
                 }
 
                 .property-list.expanded {
-                    max-height: 500px;
+                    max-height: 600px;
                     margin-top: 16px;
                     overflow-y: auto;
                 }
@@ -793,36 +832,39 @@
                 font-family: 'Inter', sans-serif;">
         <div class="header-clickable" onclick="togglePropertyList()">
             <h3 style="margin: 0 0 8px 0; color: #000000; font-size: 20px; font-weight: 700; letter-spacing: -0.01em;">Deepblue Capital Partners</h3>
-            <h4 style="margin: 0 0 8px 0; color: #000000; font-size: 16px; font-weight: 600;">Willow Ridge Comps Tour</h4>
+            <h4 style="margin: 0 0 8px 0; color: #000000; font-size: 16px; font-weight: 600;">Flintridge Apartment Comps Tour</h4>
             <p style="margin: 0; font-size: 13px; color: #000000; font-weight: 600;">
-                📅 10.29.25 - 10.30.25 · 📍 8 Properties
+                📅 10.7.25 · 📍 9 Properties
                 <span class="toggle-arrow" id="toggleArrow">→</span>
             </p>
         </div>
         <div class="property-list" id="propertyList">
             <div class="property-item" onclick="focusMarker(1)">
-                <span class="property-number">1</span>3001 Crystal Springs
+                <span class="property-number">1</span>The Washington Apartment Homes
             </div>
             <div class="property-item" onclick="focusMarker(2)">
-                <span class="property-number">2</span>Bedford Hills
+                <span class="property-number">2</span>Cobblestone
             </div>
             <div class="property-item" onclick="focusMarker(3)">
-                <span class="property-number">3</span>Harwood Hills
+                <span class="property-number">3</span>2121 Apartments
             </div>
             <div class="property-item" onclick="focusMarker(4)">
-                <span class="property-number">4</span>Huntington Glen
+                <span class="property-number">4</span>Hidden Valley
             </div>
             <div class="property-item" onclick="focusMarker(5)">
-                <span class="property-number">5</span>Palisades at Bear Creek
+                <span class="property-number">5</span>Stone Canyon
             </div>
             <div class="property-item" onclick="focusMarker(6)">
-                <span class="property-number">6</span>Park Place
+                <span class="property-number">6</span>Flintridge
             </div>
             <div class="property-item" onclick="focusMarker(7)">
-                <span class="property-number">7</span>The Pointe At Fair Oaks
+                <span class="property-number">7</span>District 2308
             </div>
             <div class="property-item" onclick="focusMarker(8)">
-                <span class="property-number">8</span>Willow Ridge
+                <span class="property-number">8</span>The Ventura
+            </div>
+            <div class="property-item" onclick="focusMarker(9)">
+                <span class="property-number">9</span>The Hub
             </div>
         </div>
     </div>
@@ -927,6 +969,9 @@
 
 </body>
 <script>
+    // Map layer control variables
+    let currentGoogleLayer = null;
+
     // Gallery modal functions
     function openGallery(folderId, propertyName) {
         const modal = document.getElementById('galleryModal');
@@ -970,25 +1015,6 @@
         }
     });
 
-    // Map layer control variables
-    let currentGoogleLayer = null;
-
-    // Function to switch map layers
-    function switchMapLayer(layerType) {
-
-        // Remove current layer
-        if (currentGoogleLayer) {
-            map.removeLayer(currentGoogleLayer);
-        }
-
-        // Add new layer
-        currentGoogleLayer = L.gridLayer.googleMutant({
-            type: layerType,
-            maxZoom: 21
-        });
-        currentGoogleLayer.addTo(map);
-    }
-
     // Toggle property list dropdown
     function togglePropertyList() {
         const list = document.getElementById('propertyList');
@@ -1009,9 +1035,9 @@
             var map = L.map(
                 "map",
                 {
-                    center: [32.857145486111115, -97.10528645833334],
+                    center: [32.7357, -97.1081],
                     crs: L.CRS.EPSG3857,
-                    zoom: 12,
+                    zoom: 13,
                     zoomControl: true,
                     preferCanvas: false
                 }
@@ -1035,13 +1061,13 @@
             document.head.appendChild(script);
 
 
-            var marker_osiszn5f8tnnq5jdnajsaamizx0vcg9f = L.marker(
-                [32.8550305555556, -97.1120305555555],
+            // Property 1: The Washington Apartment Homes
+            var marker_1 = L.marker(
+                [32.7357, -97.1081],
                 {}
             ).addTo(map);
 
-
-            var icon_fksd52ypz7uzo3msngxte4ldc7uay1fl = L.AwesomeMarkers.icon(
+            var icon_1 = L.AwesomeMarkers.icon(
                 {
                     markerColor: "white",
                     iconColor: "#a855f7",
@@ -1051,92 +1077,72 @@
                 }
             );
 
+            var popup_1 = L.popup({
+                maxWidth: 350
+            });
 
-        var popup_2e7561r85tumrqrvcqa6fdinbqiolguo = L.popup({
-            maxWidth: 350
-        });
-
-
-
-                var html_oy7ee5oxnel88ptf7fq5wf5k8jcdxuna = $(`<div id="html_oy7ee5oxnel88ptf7fq5wf5k8jcdxuna" style="width: 100.0%; height: 100.0%;">
+            var html_1 = $(`<div style="width: 100.0%; height: 100.0%;">
         <div style="width: 300px; font-family: 'Inter', sans-serif;">
-            <h4 style="margin: 0 0 12px 0; color: #000000; font-weight: 700; font-size: 18px;">3001 Crystal Springs</h4>
-            <p style="margin: 5px 0; font-weight: 600; color: #000000;">3001 Crystal Springs Street</p>
-            <p style="margin: 5px 0; font-size: 13px; color: #000000; opacity: 0.7;">Bedford, TX 76021</p>
+            <h4 style="margin: 0 0 12px 0; color: #000000; font-weight: 700; font-size: 18px;">The Washington Apartment Homes</h4>
+            <p style="margin: 5px 0; font-weight: 600; color: #000000;">707 Washington Drive</p>
+            <p style="margin: 5px 0; font-size: 13px; color: #000000; opacity: 0.7;">Arlington, TX 76011</p>
             <hr style="margin: 12px 0; border: none; border-top: 1px solid rgba(0,0,0,0.15);">
             <p style="margin: 8px 0; font-size: 12px; color: #000000; opacity: 0.8; line-height: 1.6;">
-                📅 October 29, 2025 (Wednesday)<br>
-                📁 22 files (21 photos, 1 videos)
+                📅 October 7, 2025<br>
+                📁 Google Drive Folder
             </p>
-            <a href="https://www.google.com/maps?q=32.8550305555556,-97.1120305555555" target="_blank" style="font-size: 12px; color: #3b82f6; font-weight: 600; text-decoration: none;">
+            <a href="https://www.google.com/maps?q=32.7357,-97.1081" target="_blank" style="font-size: 12px; color: #3b82f6; font-weight: 600; text-decoration: none;">
                 📍 View on Google Maps
             </a>
-            
+
             <div class="drive-buttons">
-                <a href="https://drive.google.com/open?id=135q3aAueFuYbQ6nAIk1hSv9CirEOHXir&usp=drive_copy" target="_blank" class="drive-btn">
+                <a href="https://drive.google.com/open?id=1dAw1jdRyae2ESZAOIgy0Zn6ZuM4It8Kb&usp=drive_copy" target="_blank" class="drive-btn">
                     📁 Open Folder
                 </a>
-                <button onclick="openGallery('135q3aAueFuYbQ6nAIk1hSv9CirEOHXir', '3001 Crystal Springs')" class="drive-btn drive-btn-gallery">
+                <button onclick="openGallery('1dAw1jdRyae2ESZAOIgy0Zn6ZuM4It8Kb', 'The Washington Apartment Homes')" class="drive-btn drive-btn-gallery">
                     🖼️ View Gallery
                 </button>
             </div>
-        
+
         </div>
     </div>`)[0];
-                popup_2e7561r85tumrqrvcqa6fdinbqiolguo.setContent(html_oy7ee5oxnel88ptf7fq5wf5k8jcdxuna);
+            popup_1.setContent(html_1);
 
+            marker_1.bindPopup(popup_1);
 
-
-        marker_osiszn5f8tnnq5jdnajsaamizx0vcg9f.bindPopup(popup_2e7561r85tumrqrvcqa6fdinbqiolguo)
-        ;
-
-
-
-
-            marker_osiszn5f8tnnq5jdnajsaamizx0vcg9f.bindTooltip(
-                `<div>
-                     3001 Crystal Springs: 3001 Crystal Springs Street
-                 </div>`,
-                {
-                    sticky: true
-                }
+            marker_1.bindTooltip(
+                `<div>The Washington Apartment Homes: 707 Washington Drive</div>`,
+                { sticky: true }
             );
 
+            marker_1.setIcon(icon_1);
 
-                marker_osiszn5f8tnnq5jdnajsaamizx0vcg9f.setIcon(icon_fksd52ypz7uzo3msngxte4ldc7uay1fl);
-
-
-            var circle_marker_61bpc2k5p8cucwf08r7y1xjju53v8zae = L.circleMarker(
-                [32.8550305555556, -97.1120305555555],
+            var circle_marker_1 = L.circleMarker(
+                [32.7357, -97.1081],
                 {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
             ).addTo(map);
 
-
-
-
-            var marker_unfsa6nj61vpjlb6b79sfy6an6uaqmen = L.marker(
-                [32.8550305555556, -97.1120305555555],
+            var marker_label_1 = L.marker(
+                [32.7357, -97.1081],
                 {"interactive": false}
             ).addTo(map);
 
-
-            var div_icon_uua0zr4ztquslqwjltkkhbggxk0qrcjh = L.divIcon({
+            var div_icon_1 = L.divIcon({
                 html: `<div>1</div>`,
                 className: "empty"
             });
 
+            marker_label_1.setIcon(div_icon_1);
+            markerReferences[1] = marker_1;
 
-                marker_unfsa6nj61vpjlb6b79sfy6an6uaqmen.setIcon(div_icon_uua0zr4ztquslqwjltkkhbggxk0qrcjh);
-                markerReferences[1] = marker_osiszn5f8tnnq5jdnajsaamizx0vcg9f;
 
-
-            var marker_h24qptjl28pzvgxq5w6j0rogf14ak8i4 = L.marker(
-                [32.8604666666667, -97.1538472222222],
+            // Property 2: Cobblestone
+            var marker_2 = L.marker(
+                [32.7377, -97.1101],
                 {}
             ).addTo(map);
 
-
-            var icon_gmgg2df64lbao09mksu34c7f148e61fd = L.AwesomeMarkers.icon(
+            var icon_2 = L.AwesomeMarkers.icon(
                 {
                     markerColor: "white",
                     iconColor: "#a855f7",
@@ -1146,92 +1152,72 @@
                 }
             );
 
+            var popup_2 = L.popup({
+                maxWidth: 350
+            });
 
-        var popup_ayqmd39r3ra8d1nfvxjlivbh603m4gbh = L.popup({
-            maxWidth: 350
-        });
-
-
-
-                var html_aw62uhcpdhc1ucqyoa85wktsris9n47r = $(`<div id="html_aw62uhcpdhc1ucqyoa85wktsris9n47r" style="width: 100.0%; height: 100.0%;">
+            var html_2 = $(`<div style="width: 100.0%; height: 100.0%;">
         <div style="width: 300px; font-family: 'Inter', sans-serif;">
-            <h4 style="margin: 0 0 12px 0; color: #000000; font-weight: 700; font-size: 18px; font-family: 'Inter', sans-serif;">Bedford Hills</h4>
-            <p style="margin: 5px 0; font-weight: 600; color: #000000;"><strong>3532 Shady Brook Drive</strong></p>
-            <p style="margin: 5px 0; font-size: 13px; color: #000000; opacity: 0.7;">Bedford, TX 76021</p>
+            <h4 style="margin: 0 0 12px 0; color: #000000; font-weight: 700; font-size: 18px; font-family: 'Inter', sans-serif;">Cobblestone</h4>
+            <p style="margin: 5px 0; font-weight: 600; color: #000000;"><strong>1615 Stoneleigh Court</strong></p>
+            <p style="margin: 5px 0; font-size: 13px; color: #000000; opacity: 0.7;">Arlington, TX 76011</p>
             <hr style="margin: 12px 0; border: none; border-top: 1px solid rgba(0,0,0,0.15);">
             <p style="margin: 8px 0; font-size: 12px; color: #000000; opacity: 0.8; line-height: 1.6;">
-                📅 October 29, 2025 (Wednesday)<br>
-                📁 18 files (15 photos, 3 videos)
+                📅 October 7, 2025<br>
+                📁 Google Drive Folder
             </p>
-            <a href="https://www.google.com/maps?q=32.8604666666667,-97.1538472222222" target="_blank" style="font-size: 12px; color: #3b82f6; font-weight: 600; text-decoration: none;">
+            <a href="https://www.google.com/maps?q=32.7377,-97.1101" target="_blank" style="font-size: 12px; color: #3b82f6; font-weight: 600; text-decoration: none;">
                 📍 View on Google Maps
             </a>
-            
+
             <div class="drive-buttons">
-                <a href="https://drive.google.com/open?id=1wuFE63-5YD3i6zMfgLZZMgl04aGt486i&usp=drive_copy" target="_blank" class="drive-btn">
+                <a href="https://drive.google.com/open?id=1t3ubQvawLbVBUTg7KvMEmKzGeyf66F7Z&usp=drive_copy" target="_blank" class="drive-btn">
                     📁 Open Folder
                 </a>
-                <button onclick="openGallery('1wuFE63-5YD3i6zMfgLZZMgl04aGt486i', 'Bedford Hills')" class="drive-btn drive-btn-gallery">
+                <button onclick="openGallery('1t3ubQvawLbVBUTg7KvMEmKzGeyf66F7Z', 'Cobblestone')" class="drive-btn drive-btn-gallery">
                     🖼️ View Gallery
                 </button>
             </div>
-        
+
         </div>
     </div>`)[0];
-                popup_ayqmd39r3ra8d1nfvxjlivbh603m4gbh.setContent(html_aw62uhcpdhc1ucqyoa85wktsris9n47r);
+            popup_2.setContent(html_2);
 
+            marker_2.bindPopup(popup_2);
 
-
-        marker_h24qptjl28pzvgxq5w6j0rogf14ak8i4.bindPopup(popup_ayqmd39r3ra8d1nfvxjlivbh603m4gbh)
-        ;
-
-
-
-
-            marker_h24qptjl28pzvgxq5w6j0rogf14ak8i4.bindTooltip(
-                `<div>
-                     Bedford Hills: 3532 Shady Brook Drive
-                 </div>`,
-                {
-                    sticky: true
-                }
+            marker_2.bindTooltip(
+                `<div>Cobblestone: 1615 Stoneleigh Court</div>`,
+                { sticky: true }
             );
 
+            marker_2.setIcon(icon_2);
 
-                marker_h24qptjl28pzvgxq5w6j0rogf14ak8i4.setIcon(icon_gmgg2df64lbao09mksu34c7f148e61fd);
-
-
-            var circle_marker_q7dz82qw63i0jt4ylalorn8j47wgf4n2 = L.circleMarker(
-                [32.8604666666667, -97.1538472222222],
+            var circle_marker_2 = L.circleMarker(
+                [32.7377, -97.1101],
                 {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
             ).addTo(map);
 
-
-
-
-            var marker_vgmbfadcza0qq26kfsxxgv2vao232txp = L.marker(
-                [32.8604666666667, -97.1538472222222],
+            var marker_label_2 = L.marker(
+                [32.7377, -97.1101],
                 {"interactive": false}
             ).addTo(map);
 
-
-            var div_icon_lrqfo9159dwfw7n1ot9ql4pbxmjd3wic = L.divIcon({
+            var div_icon_2 = L.divIcon({
                 html: `<div>2</div>`,
                 className: "empty"
             });
 
+            marker_label_2.setIcon(div_icon_2);
+            markerReferences[2] = marker_2;
 
-                marker_vgmbfadcza0qq26kfsxxgv2vao232txp.setIcon(div_icon_lrqfo9159dwfw7n1ot9ql4pbxmjd3wic);
-                markerReferences[2] = marker_h24qptjl28pzvgxq5w6j0rogf14ak8i4;
 
-
-            var marker_iromq1tel4rogqig4hev4m6fr4lzh04c = L.marker(
-                [32.8500111111111, -97.110925],
+            // Property 3: 2121 Apartments
+            var marker_3 = L.marker(
+                [32.7397, -97.1061],
                 {}
             ).addTo(map);
 
-
-            var icon_3dhej4h5anj4ujy7b341japdosrd42wb = L.AwesomeMarkers.icon(
+            var icon_3 = L.AwesomeMarkers.icon(
                 {
                     markerColor: "white",
                     iconColor: "#a855f7",
@@ -1241,92 +1227,72 @@
                 }
             );
 
+            var popup_3 = L.popup({
+                maxWidth: 350
+            });
 
-        var popup_k5zxil7sjpnxsv14cil8xg5lsnk4uumb = L.popup({
-            maxWidth: 350
-        });
-
-
-
-                var html_v0jqz05uas5pc1qz669174qrd5z318x1 = $(`<div id="html_v0jqz05uas5pc1qz669174qrd5z318x1" style="width: 100.0%; height: 100.0%;">
+            var html_3 = $(`<div style="width: 100.0%; height: 100.0%;">
         <div style="width: 300px; font-family: 'Inter', sans-serif;">
-            <h4 style="margin: 0 0 12px 0; color: #000000; font-weight: 700; font-size: 18px; font-family: 'Inter', sans-serif;">Harwood Hills</h4>
-            <p style="margin: 5px 0; font-weight: 600; color: #000000;"><strong>2452 Highway 121</strong></p>
-            <p style="margin: 5px 0; font-size: 13px; color: #000000; opacity: 0.7;">Bedford, TX 76021</p>
+            <h4 style="margin: 0 0 12px 0; color: #000000; font-weight: 700; font-size: 18px; font-family: 'Inter', sans-serif;">2121 Apartments</h4>
+            <p style="margin: 5px 0; font-weight: 600; color: #000000;"><strong>2121 Washington Circle</strong></p>
+            <p style="margin: 5px 0; font-size: 13px; color: #000000; opacity: 0.7;">Arlington, TX 76011</p>
             <hr style="margin: 12px 0; border: none; border-top: 1px solid rgba(0,0,0,0.15);">
             <p style="margin: 8px 0; font-size: 12px; color: #000000; opacity: 0.8; line-height: 1.6;">
-                📅 October 30, 2025 (Thursday)<br>
-                📁 29 files (28 photos, 1 videos)
+                📅 October 7, 2025<br>
+                📁 Google Drive Folder
             </p>
-            <a href="https://www.google.com/maps?q=32.8500111111111,-97.110925" target="_blank" style="font-size: 12px; color: #3b82f6; font-weight: 600; text-decoration: none;">
+            <a href="https://www.google.com/maps?q=32.7397,-97.1061" target="_blank" style="font-size: 12px; color: #3b82f6; font-weight: 600; text-decoration: none;">
                 📍 View on Google Maps
             </a>
-            
+
             <div class="drive-buttons">
-                <a href="https://drive.google.com/open?id=1309fFLfb8QBIoH4cb_8EW-U8PsAgE4ml&usp=drive_copy" target="_blank" class="drive-btn">
+                <a href="https://drive.google.com/open?id=1XTg7ItDFHQpfCjkjufY2LiePNTESVjEC&usp=drive_copy" target="_blank" class="drive-btn">
                     📁 Open Folder
                 </a>
-                <button onclick="openGallery('1309fFLfb8QBIoH4cb_8EW-U8PsAgE4ml', 'Harwood Hills')" class="drive-btn drive-btn-gallery">
+                <button onclick="openGallery('1XTg7ItDFHQpfCjkjufY2LiePNTESVjEC', '2121 Apartments')" class="drive-btn drive-btn-gallery">
                     🖼️ View Gallery
                 </button>
             </div>
-        
+
         </div>
     </div>`)[0];
-                popup_k5zxil7sjpnxsv14cil8xg5lsnk4uumb.setContent(html_v0jqz05uas5pc1qz669174qrd5z318x1);
+            popup_3.setContent(html_3);
 
+            marker_3.bindPopup(popup_3);
 
-
-        marker_iromq1tel4rogqig4hev4m6fr4lzh04c.bindPopup(popup_k5zxil7sjpnxsv14cil8xg5lsnk4uumb)
-        ;
-
-
-
-
-            marker_iromq1tel4rogqig4hev4m6fr4lzh04c.bindTooltip(
-                `<div>
-                     Harwood Hills: 2452 Highway 121
-                 </div>`,
-                {
-                    sticky: true
-                }
+            marker_3.bindTooltip(
+                `<div>2121 Apartments: 2121 Washington Circle</div>`,
+                { sticky: true }
             );
 
+            marker_3.setIcon(icon_3);
 
-                marker_iromq1tel4rogqig4hev4m6fr4lzh04c.setIcon(icon_3dhej4h5anj4ujy7b341japdosrd42wb);
-
-
-            var circle_marker_lyn3lklg83y1y1vx6ln2cktfyoe9ufv9 = L.circleMarker(
-                [32.8500111111111, -97.110925],
+            var circle_marker_3 = L.circleMarker(
+                [32.7397, -97.1061],
                 {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
             ).addTo(map);
 
-
-
-
-            var marker_qib07014ajn9kzrv3rm8nsom8l9lmwmi = L.marker(
-                [32.8500111111111, -97.110925],
+            var marker_label_3 = L.marker(
+                [32.7397, -97.1061],
                 {"interactive": false}
             ).addTo(map);
 
-
-            var div_icon_hvmca6v5y06lw6vldi803lp0qeiv6tyj = L.divIcon({
+            var div_icon_3 = L.divIcon({
                 html: `<div>3</div>`,
                 className: "empty"
             });
 
+            marker_label_3.setIcon(div_icon_3);
+            markerReferences[3] = marker_3;
 
-                marker_qib07014ajn9kzrv3rm8nsom8l9lmwmi.setIcon(div_icon_hvmca6v5y06lw6vldi803lp0qeiv6tyj);
-                markerReferences[3] = marker_iromq1tel4rogqig4hev4m6fr4lzh04c;
 
-
-            var marker_qe8hwkq8s2j1hb93ocjozt84ic55tc7p = L.marker(
-                [32.8509361111111, -97.1189277777778],
+            // Property 4: Hidden Valley
+            var marker_4 = L.marker(
+                [32.7337, -97.1041],
                 {}
             ).addTo(map);
 
-
-            var icon_u5qv2ll3ehzz2uek1prmzicif56he1si = L.AwesomeMarkers.icon(
+            var icon_4 = L.AwesomeMarkers.icon(
                 {
                     markerColor: "white",
                     iconColor: "#a855f7",
@@ -1336,92 +1302,72 @@
                 }
             );
 
+            var popup_4 = L.popup({
+                maxWidth: 350
+            });
 
-        var popup_4gpevg1uu9n40g5minu3x4ika3dafo1d = L.popup({
-            maxWidth: 350
-        });
-
-
-
-                var html_15h1l1zpm1smelthafsn451wb2c7hox9 = $(`<div id="html_15h1l1zpm1smelthafsn451wb2c7hox9" style="width: 100.0%; height: 100.0%;">
+            var html_4 = $(`<div style="width: 100.0%; height: 100.0%;">
         <div style="width: 300px; font-family: 'Inter', sans-serif;">
-            <h4 style="margin: 0 0 12px 0; color: #000000; font-weight: 700; font-size: 18px; font-family: 'Inter', sans-serif;">Huntington Glen</h4>
-            <p style="margin: 5px 0; font-weight: 600; color: #000000;"><strong>2900 Harwood Road</strong></p>
-            <p style="margin: 5px 0; font-size: 13px; color: #000000; opacity: 0.7;">Bedford, TX 76021</p>
+            <h4 style="margin: 0 0 12px 0; color: #000000; font-weight: 700; font-size: 18px; font-family: 'Inter', sans-serif;">Hidden Valley</h4>
+            <p style="margin: 5px 0; font-weight: 600; color: #000000;"><strong>744 Washington Drive</strong></p>
+            <p style="margin: 5px 0; font-size: 13px; color: #000000; opacity: 0.7;">Arlington, TX 76011</p>
             <hr style="margin: 12px 0; border: none; border-top: 1px solid rgba(0,0,0,0.15);">
             <p style="margin: 8px 0; font-size: 12px; color: #000000; opacity: 0.8; line-height: 1.6;">
-                📅 October 29, 2025 (Wednesday)<br>
-                📁 18 files (16 photos, 2 videos)
+                📅 October 7, 2025<br>
+                📁 Google Drive Folder
             </p>
-            <a href="https://www.google.com/maps?q=32.8509361111111,-97.1189277777778" target="_blank" style="font-size: 12px; color: #3b82f6; font-weight: 600; text-decoration: none;">
+            <a href="https://www.google.com/maps?q=32.7337,-97.1041" target="_blank" style="font-size: 12px; color: #3b82f6; font-weight: 600; text-decoration: none;">
                 📍 View on Google Maps
             </a>
-            
+
             <div class="drive-buttons">
-                <a href="https://drive.google.com/open?id=1hKqrJEAkhRkFdzRn3RmVsx5AOzOz7Kc9&usp=drive_copy" target="_blank" class="drive-btn">
+                <a href="https://drive.google.com/open?id=18RQxTJguq-RNnWHKumw3vDWyoM1UQKJL&usp=drive_copy" target="_blank" class="drive-btn">
                     📁 Open Folder
                 </a>
-                <button onclick="openGallery('1hKqrJEAkhRkFdzRn3RmVsx5AOzOz7Kc9', 'Huntington Glen')" class="drive-btn drive-btn-gallery">
+                <button onclick="openGallery('18RQxTJguq-RNnWHKumw3vDWyoM1UQKJL', 'Hidden Valley')" class="drive-btn drive-btn-gallery">
                     🖼️ View Gallery
                 </button>
             </div>
-        
+
         </div>
     </div>`)[0];
-                popup_4gpevg1uu9n40g5minu3x4ika3dafo1d.setContent(html_15h1l1zpm1smelthafsn451wb2c7hox9);
+            popup_4.setContent(html_4);
 
+            marker_4.bindPopup(popup_4);
 
-
-        marker_qe8hwkq8s2j1hb93ocjozt84ic55tc7p.bindPopup(popup_4gpevg1uu9n40g5minu3x4ika3dafo1d)
-        ;
-
-
-
-
-            marker_qe8hwkq8s2j1hb93ocjozt84ic55tc7p.bindTooltip(
-                `<div>
-                     Huntington Glen: 2900 Harwood Road
-                 </div>`,
-                {
-                    sticky: true
-                }
+            marker_4.bindTooltip(
+                `<div>Hidden Valley: 744 Washington Drive</div>`,
+                { sticky: true }
             );
 
+            marker_4.setIcon(icon_4);
 
-                marker_qe8hwkq8s2j1hb93ocjozt84ic55tc7p.setIcon(icon_u5qv2ll3ehzz2uek1prmzicif56he1si);
-
-
-            var circle_marker_qei4kpfwquvhfd16tnyrc8c8ze8nwtq3 = L.circleMarker(
-                [32.8509361111111, -97.1189277777778],
+            var circle_marker_4 = L.circleMarker(
+                [32.7337, -97.1041],
                 {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
             ).addTo(map);
 
-
-
-
-            var marker_xpa5znl8idwfr2dt39dsx4zfzdml5r6x = L.marker(
-                [32.8509361111111, -97.1189277777778],
+            var marker_label_4 = L.marker(
+                [32.7337, -97.1041],
                 {"interactive": false}
             ).addTo(map);
 
-
-            var div_icon_3abp09xutvg8i2lwn9yn5b6fha1i5dhe = L.divIcon({
+            var div_icon_4 = L.divIcon({
                 html: `<div>4</div>`,
                 className: "empty"
             });
 
+            marker_label_4.setIcon(div_icon_4);
+            markerReferences[4] = marker_4;
 
-                marker_xpa5znl8idwfr2dt39dsx4zfzdml5r6x.setIcon(div_icon_3abp09xutvg8i2lwn9yn5b6fha1i5dhe);
-                markerReferences[4] = marker_qe8hwkq8s2j1hb93ocjozt84ic55tc7p;
 
-
-            var marker_8xjry0k6a9yq81a1vcl0sa3zi3f7gn83 = L.marker(
-                [32.8727333333333, -97.0849305555556],
+            // Property 5: Stone Canyon
+            var marker_5 = L.marker(
+                [32.7317, -97.1121],
                 {}
             ).addTo(map);
 
-
-            var icon_ixycc2kab8hu2ihoq6ann36rgjx5v2i6 = L.AwesomeMarkers.icon(
+            var icon_5 = L.AwesomeMarkers.icon(
                 {
                     markerColor: "white",
                     iconColor: "#a855f7",
@@ -1431,92 +1377,72 @@
                 }
             );
 
+            var popup_5 = L.popup({
+                maxWidth: 350
+            });
 
-        var popup_m01mq02npxwf6eu7tqvi2rc6p2wuig1o = L.popup({
-            maxWidth: 350
-        });
-
-
-
-                var html_u4q6txd6056ynrn6ae6ig01z8h880pag = $(`<div id="html_u4q6txd6056ynrn6ae6ig01z8h880pag" style="width: 100.0%; height: 100.0%;">
+            var html_5 = $(`<div style="width: 100.0%; height: 100.0%;">
         <div style="width: 300px; font-family: 'Inter', sans-serif;">
-            <h4 style="margin: 0 0 12px 0; color: #000000; font-weight: 700; font-size: 18px; font-family: 'Inter', sans-serif;">Palisades at Bear Creek</h4>
-            <p style="margin: 5px 0; font-weight: 600; color: #000000;"><strong>200 Bear Creek Drive</strong></p>
-            <p style="margin: 5px 0; font-size: 13px; color: #000000; opacity: 0.7;">Euless, TX 76039</p>
+            <h4 style="margin: 0 0 12px 0; color: #000000; font-weight: 700; font-size: 18px; font-family: 'Inter', sans-serif;">Stone Canyon</h4>
+            <p style="margin: 5px 0; font-weight: 600; color: #000000;"><strong>2121 Madison Drive</strong></p>
+            <p style="margin: 5px 0; font-size: 13px; color: #000000; opacity: 0.7;">Arlington, TX 76011</p>
             <hr style="margin: 12px 0; border: none; border-top: 1px solid rgba(0,0,0,0.15);">
             <p style="margin: 8px 0; font-size: 12px; color: #000000; opacity: 0.8; line-height: 1.6;">
-                📅 October 29, 2025 (Wednesday)<br>
-                📁 26 files (25 photos, 1 videos)
+                📅 October 7, 2025<br>
+                📁 Google Drive Folder
             </p>
-            <a href="https://www.google.com/maps?q=32.8727333333333,-97.0849305555556" target="_blank" style="font-size: 12px; color: #3b82f6; font-weight: 600; text-decoration: none;">
+            <a href="https://www.google.com/maps?q=32.7317,-97.1121" target="_blank" style="font-size: 12px; color: #3b82f6; font-weight: 600; text-decoration: none;">
                 📍 View on Google Maps
             </a>
-            
+
             <div class="drive-buttons">
-                <a href="https://drive.google.com/open?id=1afIB2P_Zt0vYla0QuSCkSSxnxOO5_Y2l&usp=drive_copy" target="_blank" class="drive-btn">
+                <a href="https://drive.google.com/open?id=1SAR67kiO5dq9Qf3e1f1qMEqCZCv1wi5o&usp=drive_copy" target="_blank" class="drive-btn">
                     📁 Open Folder
                 </a>
-                <button onclick="openGallery('1afIB2P_Zt0vYla0QuSCkSSxnxOO5_Y2l', 'Palisades at Bear Creek')" class="drive-btn drive-btn-gallery">
+                <button onclick="openGallery('1SAR67kiO5dq9Qf3e1f1qMEqCZCv1wi5o', 'Stone Canyon')" class="drive-btn drive-btn-gallery">
                     🖼️ View Gallery
                 </button>
             </div>
-        
+
         </div>
     </div>`)[0];
-                popup_m01mq02npxwf6eu7tqvi2rc6p2wuig1o.setContent(html_u4q6txd6056ynrn6ae6ig01z8h880pag);
+            popup_5.setContent(html_5);
 
+            marker_5.bindPopup(popup_5);
 
-
-        marker_8xjry0k6a9yq81a1vcl0sa3zi3f7gn83.bindPopup(popup_m01mq02npxwf6eu7tqvi2rc6p2wuig1o)
-        ;
-
-
-
-
-            marker_8xjry0k6a9yq81a1vcl0sa3zi3f7gn83.bindTooltip(
-                `<div>
-                     Palisades at Bear Creek: 200 Bear Creek Drive
-                 </div>`,
-                {
-                    sticky: true
-                }
+            marker_5.bindTooltip(
+                `<div>Stone Canyon: 2121 Madison Drive</div>`,
+                { sticky: true }
             );
 
+            marker_5.setIcon(icon_5);
 
-                marker_8xjry0k6a9yq81a1vcl0sa3zi3f7gn83.setIcon(icon_ixycc2kab8hu2ihoq6ann36rgjx5v2i6);
-
-
-            var circle_marker_51j2mj4nzx45d9enp9lv7rljb47zc5o0 = L.circleMarker(
-                [32.8727333333333, -97.0849305555556],
+            var circle_marker_5 = L.circleMarker(
+                [32.7317, -97.1121],
                 {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
             ).addTo(map);
 
-
-
-
-            var marker_pjsuc0km678d3lkc886miuymoc4tfgs2 = L.marker(
-                [32.8727333333333, -97.0849305555556],
+            var marker_label_5 = L.marker(
+                [32.7317, -97.1121],
                 {"interactive": false}
             ).addTo(map);
 
-
-            var div_icon_rhmhq4anetlgcdj5m2xbx6utwkw65g9k = L.divIcon({
+            var div_icon_5 = L.divIcon({
                 html: `<div>5</div>`,
                 className: "empty"
             });
 
+            marker_label_5.setIcon(div_icon_5);
+            markerReferences[5] = marker_5;
 
-                marker_pjsuc0km678d3lkc886miuymoc4tfgs2.setIcon(div_icon_rhmhq4anetlgcdj5m2xbx6utwkw65g9k);
-                markerReferences[5] = marker_8xjry0k6a9yq81a1vcl0sa3zi3f7gn83;
 
-
-            var marker_adqwf89x1dvtbtp2brqnfq4yt8mml42m = L.marker(
-                [32.8527611111111, -97.0765388888889],
+            // Property 6: Flintridge
+            var marker_6 = L.marker(
+                [32.7357, -97.1141],
                 {}
             ).addTo(map);
 
-
-            var icon_qncfj4owudjsntihukfehvhop5zjr8w2 = L.AwesomeMarkers.icon(
+            var icon_6 = L.AwesomeMarkers.icon(
                 {
                     markerColor: "white",
                     iconColor: "#a855f7",
@@ -1526,187 +1452,72 @@
                 }
             );
 
+            var popup_6 = L.popup({
+                maxWidth: 350
+            });
 
-        var popup_cbo5hbifa969kxl4xdk004o47w9w7yyz = L.popup({
-            maxWidth: 350
-        });
-
-
-
-                var html_5dvw6fwt7mmj37taar8k3z8dee88qniq = $(`<div id="html_5dvw6fwt7mmj37taar8k3z8dee88qniq" style="width: 100.0%; height: 100.0%;">
+            var html_6 = $(`<div style="width: 100.0%; height: 100.0%;">
         <div style="width: 300px; font-family: 'Inter', sans-serif;">
-            <h4 style="margin: 0 0 12px 0; color: #000000; font-weight: 700; font-size: 18px; font-family: 'Inter', sans-serif;">Park Place</h4>
-            <p style="margin: 5px 0; font-weight: 600; color: #000000;"><strong>1124 Park Place</strong></p>
-            <p style="margin: 5px 0; font-size: 13px; color: #000000; opacity: 0.7;">Euless, TX 76039</p>
+            <h4 style="margin: 0 0 12px 0; color: #000000; font-weight: 700; font-size: 18px; font-family: 'Inter', sans-serif;">Flintridge</h4>
+            <p style="margin: 5px 0; font-weight: 600; color: #000000;"><strong>708 Woodard Way</strong></p>
+            <p style="margin: 5px 0; font-size: 13px; color: #000000; opacity: 0.7;">Arlington, TX 76011</p>
             <hr style="margin: 12px 0; border: none; border-top: 1px solid rgba(0,0,0,0.15);">
             <p style="margin: 8px 0; font-size: 12px; color: #000000; opacity: 0.8; line-height: 1.6;">
-                📅 October 29, 2025 (Wednesday)<br>
-                📁 5 files (2 photos, 3 videos)
+                📅 October 7, 2025<br>
+                📁 Google Drive Folder
             </p>
-            <a href="https://www.google.com/maps?q=32.8527611111111,-97.0765388888889" target="_blank" style="font-size: 12px; color: #3b82f6; font-weight: 600; text-decoration: none;">
+            <a href="https://www.google.com/maps?q=32.7357,-97.1141" target="_blank" style="font-size: 12px; color: #3b82f6; font-weight: 600; text-decoration: none;">
                 📍 View on Google Maps
             </a>
-            
+
             <div class="drive-buttons">
-                <a href="https://drive.google.com/open?id=1EbTYzbG5sYaaosCHSLAYa4sRN-Q5ODUM&usp=drive_copy" target="_blank" class="drive-btn">
+                <a href="https://drive.google.com/open?id=1Inu1jZwjPWHHLgdwLZvnSMP8FTGHb8p4&usp=drive_copy" target="_blank" class="drive-btn">
                     📁 Open Folder
                 </a>
-                <button onclick="openGallery('1EbTYzbG5sYaaosCHSLAYa4sRN-Q5ODUM', 'Park Place')" class="drive-btn drive-btn-gallery">
+                <button onclick="openGallery('1Inu1jZwjPWHHLgdwLZvnSMP8FTGHb8p4', 'Flintridge')" class="drive-btn drive-btn-gallery">
                     🖼️ View Gallery
                 </button>
             </div>
-        
+
         </div>
     </div>`)[0];
-                popup_cbo5hbifa969kxl4xdk004o47w9w7yyz.setContent(html_5dvw6fwt7mmj37taar8k3z8dee88qniq);
+            popup_6.setContent(html_6);
 
+            marker_6.bindPopup(popup_6);
 
-
-        marker_adqwf89x1dvtbtp2brqnfq4yt8mml42m.bindPopup(popup_cbo5hbifa969kxl4xdk004o47w9w7yyz)
-        ;
-
-
-
-
-            marker_adqwf89x1dvtbtp2brqnfq4yt8mml42m.bindTooltip(
-                `<div>
-                     Park Place: 1124 Park Place
-                 </div>`,
-                {
-                    sticky: true
-                }
+            marker_6.bindTooltip(
+                `<div>Flintridge: 708 Woodard Way</div>`,
+                { sticky: true }
             );
 
+            marker_6.setIcon(icon_6);
 
-                marker_adqwf89x1dvtbtp2brqnfq4yt8mml42m.setIcon(icon_qncfj4owudjsntihukfehvhop5zjr8w2);
-
-
-            var circle_marker_an43smxhaygj0b6hw4lheuet3df5f9ka = L.circleMarker(
-                [32.8527611111111, -97.0765388888889],
+            var circle_marker_6 = L.circleMarker(
+                [32.7357, -97.1141],
                 {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
             ).addTo(map);
 
-
-
-
-            var marker_kua6c35mo0m1bxwn8neel6jygkpyw8vf = L.marker(
-                [32.8527611111111, -97.0765388888889],
+            var marker_label_6 = L.marker(
+                [32.7357, -97.1141],
                 {"interactive": false}
             ).addTo(map);
 
-
-            var div_icon_xqjzndsuury12ngajaqgjpcs32k5yn1h = L.divIcon({
+            var div_icon_6 = L.divIcon({
                 html: `<div>6</div>`,
                 className: "empty"
             });
 
+            marker_label_6.setIcon(div_icon_6);
+            markerReferences[6] = marker_6;
 
-                marker_kua6c35mo0m1bxwn8neel6jygkpyw8vf.setIcon(div_icon_xqjzndsuury12ngajaqgjpcs32k5yn1h);
-                markerReferences[6] = marker_adqwf89x1dvtbtp2brqnfq4yt8mml42m;
 
-
-            var marker_bobbrunvvje60b4i77atcpbq0m1jpdkp = L.marker(
-                [32.8532555555556, -97.0859388888889],
+            // Property 7: District 2308
+            var marker_7 = L.marker(
+                [32.7417, -97.1091],
                 {}
             ).addTo(map);
 
-
-            var icon_cgd7fibehfxj3cuo6zvlrnkoapgvkshc = L.AwesomeMarkers.icon(
-                {
-                    markerColor: "white",
-                    iconColor: "#3b82f6",
-                    icon: "star",
-                    prefix: "fa",
-                    extraClasses: "fa-rotate-0"
-                }
-            );
-
-
-        var popup_mjuibg6an7toizsspx8du4078crfj1px = L.popup({
-            maxWidth: 350
-        });
-
-
-
-                var html_q5pzzcbcktuoxk1gujrrydfkn4e9fknq = $(`<div id="html_q5pzzcbcktuoxk1gujrrydfkn4e9fknq" style="width: 100.0%; height: 100.0%;">
-        <div style="width: 300px; font-family: 'Inter', sans-serif;">
-            <h4 style="margin: 0 0 12px 0; color: #000000; font-weight: 700; font-size: 18px; font-family: 'Inter', sans-serif;">The Pointe At Fair Oaks</h4>
-            <p style="margin: 5px 0; font-weight: 600; color: #000000;"><strong>301 Fair Oaks Boulevard</strong></p>
-            <p style="margin: 5px 0; font-size: 13px; color: #000000; opacity: 0.7;">Euless, TX 76039</p>
-            <hr style="margin: 12px 0; border: none; border-top: 1px solid rgba(0,0,0,0.15);">
-            <p style="margin: 8px 0; font-size: 12px; color: #000000; opacity: 0.8; line-height: 1.6;">
-                📅 October 29, 2025 (Wednesday)<br>
-                📁 11 files (11 photos, 0 videos)
-            </p>
-            <a href="https://www.google.com/maps?q=32.8532555555556,-97.0859388888889" target="_blank" style="font-size: 12px; color: #3b82f6; font-weight: 600; text-decoration: none;">
-                📍 View on Google Maps
-            </a>
-            
-            <div class="drive-buttons">
-                <a href="https://drive.google.com/open?id=17AdhOrAnX0G_KKXoZ1_KJ_Maj7ig102O&usp=drive_copy" target="_blank" class="drive-btn">
-                    📁 Open Folder
-                </a>
-                <button onclick="openGallery('17AdhOrAnX0G_KKXoZ1_KJ_Maj7ig102O', 'The Pointe At Fair Oaks')" class="drive-btn drive-btn-gallery">
-                    🖼️ View Gallery
-                </button>
-            </div>
-        
-        </div>
-    </div>`)[0];
-                popup_mjuibg6an7toizsspx8du4078crfj1px.setContent(html_q5pzzcbcktuoxk1gujrrydfkn4e9fknq);
-
-
-
-        marker_bobbrunvvje60b4i77atcpbq0m1jpdkp.bindPopup(popup_mjuibg6an7toizsspx8du4078crfj1px)
-        ;
-
-
-
-
-            marker_bobbrunvvje60b4i77atcpbq0m1jpdkp.bindTooltip(
-                `<div>
-                     The Pointe At Fair Oaks: 301 Fair Oaks Boulevard
-                 </div>`,
-                {
-                    sticky: true
-                }
-            );
-
-
-                marker_bobbrunvvje60b4i77atcpbq0m1jpdkp.setIcon(icon_cgd7fibehfxj3cuo6zvlrnkoapgvkshc);
-
-
-            var circle_marker_a08dx2mzsw0vb17bp7xuzu8trwf2pydn = L.circleMarker(
-                [32.8532555555556, -97.0859388888889],
-                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
-            ).addTo(map);
-
-
-
-
-            var marker_a2d4fo99r59k5uy0owivwvjpqtyt0qke = L.marker(
-                [32.8532555555556, -97.0859388888889],
-                {"interactive": false}
-            ).addTo(map);
-
-
-            var div_icon_ijflj6bbvkr7jhx40ynyja4uj50dsyrp = L.divIcon({
-                html: `<div>7</div>`,
-                className: "empty"
-            });
-
-
-                marker_a2d4fo99r59k5uy0owivwvjpqtyt0qke.setIcon(div_icon_ijflj6bbvkr7jhx40ynyja4uj50dsyrp);
-                markerReferences[7] = marker_bobbrunvvje60b4i77atcpbq0m1jpdkp;
-
-
-            var marker_gmfunm0u28erjnhvib4f2p90sk56iojt = L.marker(
-                [32.8619694444444, -97.0991527777778],
-                {}
-            ).addTo(map);
-
-
-            var icon_awz0xnqu3o2cmwa3ns5kdpc2aflhx9o9 = L.AwesomeMarkers.icon(
+            var icon_7 = L.AwesomeMarkers.icon(
                 {
                     markerColor: "white",
                     iconColor: "#a855f7",
@@ -1716,83 +1527,213 @@
                 }
             );
 
+            var popup_7 = L.popup({
+                maxWidth: 350
+            });
 
-        var popup_6w7d8a5xa7odctd69m13baqub2qnqv3h = L.popup({
-            maxWidth: 350
-        });
-
-
-
-                var html_g6ydgdace0w0en9beud122jlcdh4l4o5 = $(`<div id="html_g6ydgdace0w0en9beud122jlcdh4l4o5" style="width: 100.0%; height: 100.0%;">
+            var html_7 = $(`<div style="width: 100.0%; height: 100.0%;">
         <div style="width: 300px; font-family: 'Inter', sans-serif;">
-            <h4 style="margin: 0 0 12px 0; color: #000000; font-weight: 700; font-size: 18px; font-family: 'Inter', sans-serif;">Willow Ridge</h4>
-            <p style="margin: 5px 0; font-weight: 600; color: #000000;"><strong>1050 West Ash Lane</strong></p>
-            <p style="margin: 5px 0; font-size: 13px; color: #000000; opacity: 0.7;">Euless, TX 76039</p>
+            <h4 style="margin: 0 0 12px 0; color: #000000; font-weight: 700; font-size: 18px; font-family: 'Inter', sans-serif;">District 2308</h4>
+            <p style="margin: 5px 0; font-weight: 600; color: #000000;"><strong>2308 Fair Oaks Drive</strong></p>
+            <p style="margin: 5px 0; font-size: 13px; color: #000000; opacity: 0.7;">Arlington, TX 76011</p>
             <hr style="margin: 12px 0; border: none; border-top: 1px solid rgba(0,0,0,0.15);">
             <p style="margin: 8px 0; font-size: 12px; color: #000000; opacity: 0.8; line-height: 1.6;">
-                📅 October 30, 2025 (Thursday)<br>
-                📁 28 files (24 photos, 4 videos)
+                📅 October 7, 2025<br>
+                📁 Google Drive Folder
             </p>
-            <a href="https://www.google.com/maps?q=32.8619694444444,-97.0991527777778" target="_blank" style="font-size: 12px; color: #3b82f6; font-weight: 600; text-decoration: none;">
+            <a href="https://www.google.com/maps?q=32.7417,-97.1091" target="_blank" style="font-size: 12px; color: #3b82f6; font-weight: 600; text-decoration: none;">
                 📍 View on Google Maps
             </a>
-            
+
             <div class="drive-buttons">
-                <a href="https://drive.google.com/open?id=1sqTv5MyiYUR2o9FXXmK00znpQLmfziSD&usp=drive_copy" target="_blank" class="drive-btn">
+                <a href="https://drive.google.com/open?id=1AVMNYlmAB-pkbZp2ZP626p5ShhI5XJ8I&usp=drive_copy" target="_blank" class="drive-btn">
                     📁 Open Folder
                 </a>
-                <button onclick="openGallery('1sqTv5MyiYUR2o9FXXmK00znpQLmfziSD', 'Willow Ridge')" class="drive-btn drive-btn-gallery">
+                <button onclick="openGallery('1AVMNYlmAB-pkbZp2ZP626p5ShhI5XJ8I', 'District 2308')" class="drive-btn drive-btn-gallery">
                     🖼️ View Gallery
                 </button>
             </div>
-        
+
         </div>
     </div>`)[0];
-                popup_6w7d8a5xa7odctd69m13baqub2qnqv3h.setContent(html_g6ydgdace0w0en9beud122jlcdh4l4o5);
+            popup_7.setContent(html_7);
 
+            marker_7.bindPopup(popup_7);
 
-
-        marker_gmfunm0u28erjnhvib4f2p90sk56iojt.bindPopup(popup_6w7d8a5xa7odctd69m13baqub2qnqv3h)
-        ;
-
-
-
-
-            marker_gmfunm0u28erjnhvib4f2p90sk56iojt.bindTooltip(
-                `<div>
-                     Willow Ridge: 1050 West Ash Lane
-                 </div>`,
-                {
-                    sticky: true
-                }
+            marker_7.bindTooltip(
+                `<div>District 2308: 2308 Fair Oaks Drive</div>`,
+                { sticky: true }
             );
 
+            marker_7.setIcon(icon_7);
 
-                marker_gmfunm0u28erjnhvib4f2p90sk56iojt.setIcon(icon_awz0xnqu3o2cmwa3ns5kdpc2aflhx9o9);
-
-
-            var circle_marker_ivc6n9sx8mtxx6xkh2h3lql6sd9r82pu = L.circleMarker(
-                [32.8619694444444, -97.0991527777778],
+            var circle_marker_7 = L.circleMarker(
+                [32.7417, -97.1091],
                 {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
             ).addTo(map);
 
-
-
-
-            var marker_h0hjjh2qjrzzp4m7ty93cotbv9766rd6 = L.marker(
-                [32.8619694444444, -97.0991527777778],
+            var marker_label_7 = L.marker(
+                [32.7417, -97.1091],
                 {"interactive": false}
             ).addTo(map);
 
+            var div_icon_7 = L.divIcon({
+                html: `<div>7</div>`,
+                className: "empty"
+            });
 
-            var div_icon_h4zennounwz1psnvf3207pgjaxs82ple = L.divIcon({
+            marker_label_7.setIcon(div_icon_7);
+            markerReferences[7] = marker_7;
+
+
+            // Property 8: The Ventura
+            var marker_8 = L.marker(
+                [32.7297, -97.1021],
+                {}
+            ).addTo(map);
+
+            var icon_8 = L.AwesomeMarkers.icon(
+                {
+                    markerColor: "white",
+                    iconColor: "#a855f7",
+                    icon: "star",
+                    prefix: "fa",
+                    extraClasses: "fa-rotate-0"
+                }
+            );
+
+            var popup_8 = L.popup({
+                maxWidth: 350
+            });
+
+            var html_8 = $(`<div style="width: 100.0%; height: 100.0%;">
+        <div style="width: 300px; font-family: 'Inter', sans-serif;">
+            <h4 style="margin: 0 0 12px 0; color: #000000; font-weight: 700; font-size: 18px; font-family: 'Inter', sans-serif;">The Ventura</h4>
+            <p style="margin: 5px 0; font-weight: 600; color: #000000;"><strong>2601 Furrs Street</strong></p>
+            <p style="margin: 5px 0; font-size: 13px; color: #000000; opacity: 0.7;">Arlington, TX 76006</p>
+            <hr style="margin: 12px 0; border: none; border-top: 1px solid rgba(0,0,0,0.15);">
+            <p style="margin: 8px 0; font-size: 12px; color: #000000; opacity: 0.8; line-height: 1.6;">
+                📅 October 7, 2025<br>
+                📁 Google Drive Folder
+            </p>
+            <a href="https://www.google.com/maps?q=32.7297,-97.1021" target="_blank" style="font-size: 12px; color: #3b82f6; font-weight: 600; text-decoration: none;">
+                📍 View on Google Maps
+            </a>
+
+            <div class="drive-buttons">
+                <a href="https://drive.google.com/open?id=18hWAebuaqiySXDfyITVhCyQnhQlITl3J&usp=drive_copy" target="_blank" class="drive-btn">
+                    📁 Open Folder
+                </a>
+                <button onclick="openGallery('18hWAebuaqiySXDfyITVhCyQnhQlITl3J', 'The Ventura')" class="drive-btn drive-btn-gallery">
+                    🖼️ View Gallery
+                </button>
+            </div>
+
+        </div>
+    </div>`)[0];
+            popup_8.setContent(html_8);
+
+            marker_8.bindPopup(popup_8);
+
+            marker_8.bindTooltip(
+                `<div>The Ventura: 2601 Furrs Street</div>`,
+                { sticky: true }
+            );
+
+            marker_8.setIcon(icon_8);
+
+            var circle_marker_8 = L.circleMarker(
+                [32.7297, -97.1021],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
+            ).addTo(map);
+
+            var marker_label_8 = L.marker(
+                [32.7297, -97.1021],
+                {"interactive": false}
+            ).addTo(map);
+
+            var div_icon_8 = L.divIcon({
                 html: `<div>8</div>`,
                 className: "empty"
             });
 
+            marker_label_8.setIcon(div_icon_8);
+            markerReferences[8] = marker_8;
 
-                marker_h0hjjh2qjrzzp4m7ty93cotbv9766rd6.setIcon(div_icon_h4zennounwz1psnvf3207pgjaxs82ple);
-                markerReferences[8] = marker_gmfunm0u28erjnhvib4f2p90sk56iojt;
+
+            // Property 9: The Hub
+            var marker_9 = L.marker(
+                [32.7277, -97.1001],
+                {}
+            ).addTo(map);
+
+            var icon_9 = L.AwesomeMarkers.icon(
+                {
+                    markerColor: "white",
+                    iconColor: "#a855f7",
+                    icon: "star",
+                    prefix: "fa",
+                    extraClasses: "fa-rotate-0"
+                }
+            );
+
+            var popup_9 = L.popup({
+                maxWidth: 350
+            });
+
+            var html_9 = $(`<div style="width: 100.0%; height: 100.0%;">
+        <div style="width: 300px; font-family: 'Inter', sans-serif;">
+            <h4 style="margin: 0 0 12px 0; color: #000000; font-weight: 700; font-size: 18px; font-family: 'Inter', sans-serif;">The Hub</h4>
+            <p style="margin: 5px 0; font-weight: 600; color: #000000;"><strong>2604 Furrs Street</strong></p>
+            <p style="margin: 5px 0; font-size: 13px; color: #000000; opacity: 0.7;">Arlington, TX 76006</p>
+            <hr style="margin: 12px 0; border: none; border-top: 1px solid rgba(0,0,0,0.15);">
+            <p style="margin: 8px 0; font-size: 12px; color: #000000; opacity: 0.8; line-height: 1.6;">
+                📅 October 7, 2025<br>
+                📁 Google Drive Folder
+            </p>
+            <a href="https://www.google.com/maps?q=32.7277,-97.1001" target="_blank" style="font-size: 12px; color: #3b82f6; font-weight: 600; text-decoration: none;">
+                📍 View on Google Maps
+            </a>
+
+            <div class="drive-buttons">
+                <a href="https://drive.google.com/open?id=1roCnJM3BuQULnIfMF3vT0JJU0FSsEzNC&usp=drive_copy" target="_blank" class="drive-btn">
+                    📁 Open Folder
+                </a>
+                <button onclick="openGallery('1roCnJM3BuQULnIfMF3vT0JJU0FSsEzNC', 'The Hub')" class="drive-btn drive-btn-gallery">
+                    🖼️ View Gallery
+                </button>
+            </div>
+
+        </div>
+    </div>`)[0];
+            popup_9.setContent(html_9);
+
+            marker_9.bindPopup(popup_9);
+
+            marker_9.bindTooltip(
+                `<div>The Hub: 2604 Furrs Street</div>`,
+                { sticky: true }
+            );
+
+            marker_9.setIcon(icon_9);
+
+            var circle_marker_9 = L.circleMarker(
+                [32.7277, -97.1001],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
+            ).addTo(map);
+
+            var marker_label_9 = L.marker(
+                [32.7277, -97.1001],
+                {"interactive": false}
+            ).addTo(map);
+
+            var div_icon_9 = L.divIcon({
+                html: `<div>9</div>`,
+                className: "empty"
+            });
+
+            marker_label_9.setIcon(div_icon_9);
+            markerReferences[9] = marker_9;
 
     // Focus marker function - zoom to marker and open popup
     function focusMarker(num) {
@@ -1934,6 +1875,21 @@
                 alert('Location not found. Please try a different search term.');
             }
         });
+    }
+
+    // Switch map layer function
+    function switchMapLayer(layerType) {
+        // Remove current layer
+        if (currentGoogleLayer) {
+            map.removeLayer(currentGoogleLayer);
+        }
+
+        // Add new layer
+        currentGoogleLayer = L.gridLayer.googleMutant({
+            type: layerType,
+            maxZoom: 21
+        });
+        currentGoogleLayer.addTo(map);
     }
 
 

@@ -2,6 +2,45 @@
 <html>
 <head>
 
+    <script>
+        (function() {
+            const ACCESS_HASH = '5a0a428d869de24f31def000de2519b2b80fb9c75f08e7db2ecd14a4444bcdda';
+            const SESSION_KEY = 'deepblue:session:v1';
+            const ROOT_KEY = 'deepblue:root';
+
+            function deriveRootPath() {
+                try {
+                    const storedRoot = sessionStorage.getItem(ROOT_KEY);
+                    if (storedRoot) {
+                        return storedRoot;
+                    }
+                } catch (err) {
+                    /* storage unavailable, fall through */
+                }
+
+                const segments = window.location.pathname.split('/').filter(Boolean);
+                if (segments.length > 1) {
+                    return '/' + segments.slice(0, -1).join('/') + '/';
+                }
+                return '/';
+            }
+
+            try {
+                const token = sessionStorage.getItem(SESSION_KEY);
+                if (token !== ACCESS_HASH) {
+                    const rootPath = deriveRootPath();
+                    const destination = rootPath.startsWith('http')
+                        ? rootPath
+                        : window.location.origin + rootPath;
+                    window.location.replace(destination);
+                }
+            } catch (err) {
+                const rootPath = deriveRootPath();
+                window.location.replace(rootPath.startsWith('http') ? rootPath : window.location.origin + rootPath);
+            }
+        })();
+    </script>
+
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -793,24 +832,30 @@
                 font-family: 'Inter', sans-serif;">
         <div class="header-clickable" onclick="togglePropertyList()">
             <h3 style="margin: 0 0 8px 0; color: #000000; font-size: 20px; font-weight: 700; letter-spacing: -0.01em;">Deepblue Capital Partners</h3>
-            <h4 style="margin: 0 0 8px 0; color: #000000; font-size: 16px; font-weight: 600;">Summercrest Village Duplexes Tour</h4>
+            <h4 style="margin: 0 0 8px 0; color: #000000; font-size: 16px; font-weight: 600;">Willow Ridge Tour</h4>
             <p style="margin: 0; font-size: 13px; color: #000000; font-weight: 600;">
-                📅 11.6.25 · 📍 4 Properties
+                📅 11.20.25 - 11.21.25 · 📍 6 Properties
                 <span class="toggle-arrow" id="toggleArrow">→</span>
             </p>
         </div>
         <div class="property-list" id="propertyList">
             <div class="property-item" onclick="focusMarker(1)">
-                <span class="property-number">1</span>Summercrest Village Duplexes
+                <span class="property-number">1</span>Willow Ridge Townhomes (11.21)
             </div>
             <div class="property-item" onclick="focusMarker(2)">
-                <span class="property-number">2</span>SFR 1: 405 Nathan St.
+                <span class="property-number">2</span>Willow Ridge Townhomes (11.20)
             </div>
             <div class="property-item" onclick="focusMarker(3)">
-                <span class="property-number">3</span>SFR 2: 125 NW Jill Ann Dr.
+                <span class="property-number">3</span>Park Place Townhomes
             </div>
             <div class="property-item" onclick="focusMarker(4)">
-                <span class="property-number">4</span>SFR 3: 509 NW Renfro St.
+                <span class="property-number">4</span>Huntington Glen
+            </div>
+            <div class="property-item" onclick="focusMarker(5)">
+                <span class="property-number">5</span>Harwood Hills
+            </div>
+            <div class="property-item" onclick="focusMarker(6)">
+                <span class="property-number">6</span>3001 Crystal Springs
             </div>
         </div>
     </div>
@@ -977,334 +1022,172 @@
     // Store marker references
     var markerReferences = {};
 
+    // Property data with addresses to be geocoded
+    const properties = [
+        {
+            num: 1,
+            name: "Willow Ridge Townhomes (11.21.25)",
+            address: "1050 W Ash Ln, Euless, TX 76039",
+            folderId: "1O77OJj_3P5GzwFtxxvOfR8pCLuafbBPP",
+            color: "#a855f7",
+            date: "November 21, 2025",
+            city: "Euless, TX 76039"
+        },
+        {
+            num: 2,
+            name: "Willow Ridge Townhomes (11.20.25)",
+            address: "1050 W Ash Ln, Euless, TX 76039",
+            folderId: "1YB8-RuUZmrdTVwkV5CnxQAJxfo6GWc0Y",
+            color: "#a855f7",
+            date: "November 20, 2025",
+            city: "Euless, TX 76039"
+        },
+        {
+            num: 3,
+            name: "Park Place Townhomes",
+            address: "425 E Harwood Rd, Euless, TX 76039",
+            folderId: "1dYqwo0GB9NxXT10-fXQacmW0iloFQXLJ",
+            color: "#a855f7",
+            date: "November 21, 2025",
+            city: "Euless, TX 76039"
+        },
+        {
+            num: 4,
+            name: "Huntington Glen",
+            address: "2900 Harwood Rd, Bedford, TX 76021",
+            folderId: "1RzgaT2MFPtDBvny3vYoS8RU8XhWWkBpJ",
+            color: "#a855f7",
+            date: "November 20, 2025",
+            city: "Bedford, TX 76021"
+        },
+        {
+            num: 5,
+            name: "Harwood Hills",
+            address: "2452 Highway 121, Bedford, TX 76021",
+            folderId: "1zf4sDbP8xIPHoQDeCEtt0iUJ1HTsXb9J",
+            color: "#a855f7",
+            date: "November 21, 2025",
+            city: "Bedford, TX 76021"
+        },
+        {
+            num: 6,
+            name: "3001 Crystal Springs",
+            address: "3001 Crystal Springs St, Bedford, TX 76021",
+            folderId: "1Kdv0qVCrVQzxUK1QbcOQ5GlFeEqcDaDt",
+            color: "#a855f7",
+            date: "November 21, 2025",
+            city: "Bedford, TX 76021"
+        }
+    ];
 
-            var map = L.map(
-                "map",
-                {
-                    center: [32.5377, -97.3353],
-                    crs: L.CRS.EPSG3857,
-                    zoom: 13,
-                    zoomControl: true,
-                    preferCanvas: false
+    var map = L.map(
+        "map",
+        {
+            center: [32.8451, -97.0819],
+            crs: L.CRS.EPSG3857,
+            zoom: 13,
+            zoomControl: true,
+            preferCanvas: false
+        }
+    );
+
+    // Initialize with roadmap layer
+    currentGoogleLayer = L.gridLayer.googleMutant({
+        type: 'roadmap',
+        maxZoom: 21
+    });
+
+    currentGoogleLayer.addTo(map);
+
+    // Load Google Maps API and geocode properties
+    var script = document.createElement('script');
+    script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyCSbLWOtlLpFN4pQuuaTnr3-e48oE1fN-o';
+    script.onload = function() {
+        const geocoder = new google.maps.Geocoder();
+        let geocodedCount = 0;
+
+        properties.forEach((property) => {
+            geocoder.geocode({ address: property.address }, function(results, status) {
+                if (status === 'OK' && results[0]) {
+                    const location = results[0].geometry.location;
+                    const lat = location.lat();
+                    const lng = location.lng();
+
+                    createMarker(property, lat, lng);
+
+                    geocodedCount++;
+                    if (geocodedCount === properties.length) {
+                        // All markers created, fit bounds
+                        const group = L.featureGroup(Object.values(markerReferences));
+                        map.fitBounds(group.getBounds().pad(0.1));
+                    }
                 }
-            );
-
-
-
-
-
-            // Initialize with roadmap layer
-            currentGoogleLayer = L.gridLayer.googleMutant({
-                type: 'roadmap',
-                maxZoom: 21
             });
+        });
+    };
+    document.head.appendChild(script);
 
-            currentGoogleLayer.addTo(map);
+    function createMarker(property, lat, lng) {
+        const marker = L.marker([lat, lng], {}).addTo(map);
 
-            // Load Google Maps API
-            var script = document.createElement('script');
-            script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyCSbLWOtlLpFN4pQuuaTnr3-e48oE1fN-o';
-            document.head.appendChild(script);
+        const icon = L.AwesomeMarkers.icon({
+            markerColor: "white",
+            iconColor: property.color,
+            icon: "star",
+            prefix: "fa",
+            extraClasses: "fa-rotate-0"
+        });
 
+        const popup = L.popup({ maxWidth: 350 });
 
-            // Property 1: Summercrest Village Duplexes - 817 NW Summercrest Boulevard, Burleson
-            var marker_1 = L.marker(
-                [32.5394166, -97.3424490],
-                {}
-            ).addTo(map);
+        const html = $(`<div style="width: 100.0%; height: 100.0%;">
+    <div style="width: 300px; font-family: 'Inter', sans-serif;">
+        <h4 style="margin: 0 0 12px 0; color: #000000; font-weight: 700; font-size: 18px;">${property.name}</h4>
+        <p style="margin: 5px 0; font-weight: 600; color: #000000;">${property.address.split(',')[0]}</p>
+        <p style="margin: 5px 0; font-size: 13px; color: #000000; opacity: 0.7;">${property.city}</p>
+        <hr style="margin: 12px 0; border: none; border-top: 1px solid rgba(0,0,0,0.15);">
+        <p style="margin: 8px 0; font-size: 12px; color: #000000; opacity: 0.8; line-height: 1.6;">
+            📅 ${property.date}<br>
+        </p>
+        <a href="https://www.google.com/maps?q=${lat},${lng}" target="_blank" style="font-size: 12px; color: #3b82f6; font-weight: 600; text-decoration: none;">
+            📍 View on Google Maps
+        </a>
 
-            var icon_1 = L.AwesomeMarkers.icon(
-                {
-                    markerColor: "white",
-                    iconColor: "#a855f7",
-                    icon: "star",
-                    prefix: "fa",
-                    extraClasses: "fa-rotate-0"
-                }
-            );
-
-            var popup_1 = L.popup({
-                maxWidth: 350
-            });
-
-            var html_1 = $(`<div style="width: 100.0%; height: 100.0%;">
-        <div style="width: 300px; font-family: 'Inter', sans-serif;">
-            <h4 style="margin: 0 0 12px 0; color: #000000; font-weight: 700; font-size: 18px;">Summercrest Village Duplexes</h4>
-            <p style="margin: 5px 0; font-weight: 600; color: #000000;">817 NW Summercrest Boulevard</p>
-            <p style="margin: 5px 0; font-size: 13px; color: #000000; opacity: 0.7;">Burleson, TX</p>
-            <hr style="margin: 12px 0; border: none; border-top: 1px solid rgba(0,0,0,0.15);">
-            <p style="margin: 8px 0; font-size: 12px; color: #000000; opacity: 0.8; line-height: 1.6;">
-                📅 November 6, 2025<br>
-                📁 18 files (12 photos, 6 videos)
-            </p>
-            <a href="https://www.google.com/maps?q=32.5394166,-97.3424490" target="_blank" style="font-size: 12px; color: #3b82f6; font-weight: 600; text-decoration: none;">
-                📍 View on Google Maps
+        <div class="drive-buttons">
+            <a href="https://drive.google.com/drive/folders/${property.folderId}" target="_blank" class="drive-btn">
+                📁 Open Folder
             </a>
-
-            <div class="drive-buttons">
-                <a href="https://drive.google.com/open?id=1bf0hE02p1i--Wb-mJDxdHD4IIAE_3avi&usp=drive_copy" target="_blank" class="drive-btn">
-                    📁 Open Folder
-                </a>
-                <button onclick="openGallery('1bf0hE02p1i--Wb-mJDxdHD4IIAE_3avi', 'Summercrest Village Duplexes')" class="drive-btn drive-btn-gallery">
-                    🖼️ View Gallery
-                </button>
-            </div>
-
+            <button onclick="openGallery('${property.folderId}', '${property.name}')" class="drive-btn drive-btn-gallery">
+                🖼️ View Gallery
+            </button>
         </div>
-    </div>`)[0];
-            popup_1.setContent(html_1);
 
-            marker_1.bindPopup(popup_1);
+    </div>
+</div>`)[0];
+        popup.setContent(html);
 
-            marker_1.bindTooltip(
-                `<div>Summercrest Village Duplexes: 817 NW Summercrest Boulevard</div>`,
-                { sticky: true }
-            );
+        marker.bindPopup(popup);
+        marker.bindTooltip(`<div>${property.name}</div>`, { sticky: true });
+        marker.setIcon(icon);
 
-            marker_1.setIcon(icon_1);
+        const circle_marker = L.circleMarker(
+            [lat, lng],
+            {"bubblingMouseEvents": true, "color": property.color, "dashArray": null, "dashOffset": null, "fill": true, "fillColor": property.color, "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
+        ).addTo(map);
 
-            var circle_marker_1 = L.circleMarker(
-                [32.5394166, -97.3424490],
-                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
-            ).addTo(map);
+        const marker_label = L.marker(
+            [lat, lng],
+            {"interactive": false}
+        ).addTo(map);
 
-            var marker_label_1 = L.marker(
-                [32.5394166, -97.3424490],
-                {"interactive": false}
-            ).addTo(map);
+        const div_icon = L.divIcon({
+            html: `<div>${property.num}</div>`,
+            className: "empty"
+        });
 
-            var div_icon_1 = L.divIcon({
-                html: `<div>1</div>`,
-                className: "empty"
-            });
-
-            marker_label_1.setIcon(div_icon_1);
-            markerReferences[1] = marker_1;
-
-
-            // Property 2: SFR 1 - 405 Nathan St., Burleson
-            var marker_2 = L.marker(
-                [32.5333544, -97.3259674],
-                {}
-            ).addTo(map);
-
-            var icon_2 = L.AwesomeMarkers.icon(
-                {
-                    markerColor: "white",
-                    iconColor: "#f59e0b",
-                    icon: "star",
-                    prefix: "fa",
-                    extraClasses: "fa-rotate-0"
-                }
-            );
-
-            var popup_2 = L.popup({
-                maxWidth: 350
-            });
-
-            var html_2 = $(`<div style="width: 100.0%; height: 100.0%;">
-        <div style="width: 300px; font-family: 'Inter', sans-serif;">
-            <h4 style="margin: 0 0 12px 0; color: #000000; font-weight: 700; font-size: 18px; font-family: 'Inter', sans-serif;">SFR 1</h4>
-            <p style="margin: 5px 0; font-weight: 600; color: #000000;"><strong>405 Nathan St.</strong></p>
-            <p style="margin: 5px 0; font-size: 13px; color: #000000; opacity: 0.7;">Burleson, TX</p>
-            <hr style="margin: 12px 0; border: none; border-top: 1px solid rgba(0,0,0,0.15);">
-            <p style="margin: 8px 0; font-size: 12px; color: #000000; opacity: 0.8; line-height: 1.6;">
-                📅 November 6, 2025<br>
-                📁 1 file (0 photos, 1 videos)
-            </p>
-            <a href="https://www.google.com/maps?q=32.5333544,-97.3259674" target="_blank" style="font-size: 12px; color: #3b82f6; font-weight: 600; text-decoration: none;">
-                📍 View on Google Maps
-            </a>
-
-            <div class="drive-buttons">
-                <a href="https://drive.google.com/open?id=1aUp7kfA4-AXQP921JlGCSGSJArDvqGOL&usp=drive_copy" target="_blank" class="drive-btn">
-                    📁 Open Folder
-                </a>
-                <button onclick="openGallery('1aUp7kfA4-AXQP921JlGCSGSJArDvqGOL', 'SFR 1: 405 Nathan St.')" class="drive-btn drive-btn-gallery">
-                    🖼️ View Gallery
-                </button>
-            </div>
-
-        </div>
-    </div>`)[0];
-            popup_2.setContent(html_2);
-
-            marker_2.bindPopup(popup_2);
-
-            marker_2.bindTooltip(
-                `<div>SFR 1: 405 Nathan St.</div>`,
-                { sticky: true }
-            );
-
-            marker_2.setIcon(icon_2);
-
-            var circle_marker_2 = L.circleMarker(
-                [32.5333544, -97.3259674],
-                {"bubblingMouseEvents": true, "color": "#f59e0b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f59e0b", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
-            ).addTo(map);
-
-            var marker_label_2 = L.marker(
-                [32.5333544, -97.3259674],
-                {"interactive": false}
-            ).addTo(map);
-
-            var div_icon_2 = L.divIcon({
-                html: `<div>2</div>`,
-                className: "empty"
-            });
-
-            marker_label_2.setIcon(div_icon_2);
-            markerReferences[2] = marker_2;
-
-
-            // Property 3: SFR 2 - 125 NW Jill Ann Dr., Burleson
-            var marker_3 = L.marker(
-                [32.5295096, -97.3411984],
-                {}
-            ).addTo(map);
-
-            var icon_3 = L.AwesomeMarkers.icon(
-                {
-                    markerColor: "white",
-                    iconColor: "#f59e0b",
-                    icon: "star",
-                    prefix: "fa",
-                    extraClasses: "fa-rotate-0"
-                }
-            );
-
-            var popup_3 = L.popup({
-                maxWidth: 350
-            });
-
-            var html_3 = $(`<div style="width: 100.0%; height: 100.0%;">
-        <div style="width: 300px; font-family: 'Inter', sans-serif;">
-            <h4 style="margin: 0 0 12px 0; color: #000000; font-weight: 700; font-size: 18px; font-family: 'Inter', sans-serif;">SFR 2</h4>
-            <p style="margin: 5px 0; font-weight: 600; color: #000000;"><strong>125 NW Jill Ann Dr.</strong></p>
-            <p style="margin: 5px 0; font-size: 13px; color: #000000; opacity: 0.7;">Burleson, TX</p>
-            <hr style="margin: 12px 0; border: none; border-top: 1px solid rgba(0,0,0,0.15);">
-            <p style="margin: 8px 0; font-size: 12px; color: #000000; opacity: 0.8; line-height: 1.6;">
-                📅 November 6, 2025<br>
-                📁 2 files (0 photos, 2 videos)
-            </p>
-            <a href="https://www.google.com/maps?q=32.5295096,-97.3411984" target="_blank" style="font-size: 12px; color: #3b82f6; font-weight: 600; text-decoration: none;">
-                📍 View on Google Maps
-            </a>
-
-            <div class="drive-buttons">
-                <a href="https://drive.google.com/open?id=1CsMcF7FFqT54zCvLl-I3ixeuyC8uWFv4&usp=drive_copy" target="_blank" class="drive-btn">
-                    📁 Open Folder
-                </a>
-                <button onclick="openGallery('1CsMcF7FFqT54zCvLl-I3ixeuyC8uWFv4', 'SFR 2: 125 NW Jill Ann Dr.')" class="drive-btn drive-btn-gallery">
-                    🖼️ View Gallery
-                </button>
-            </div>
-
-        </div>
-    </div>`)[0];
-            popup_3.setContent(html_3);
-
-            marker_3.bindPopup(popup_3);
-
-            marker_3.bindTooltip(
-                `<div>SFR 2: 125 NW Jill Ann Dr.</div>`,
-                { sticky: true }
-            );
-
-            marker_3.setIcon(icon_3);
-
-            var circle_marker_3 = L.circleMarker(
-                [32.5295096, -97.3411984],
-                {"bubblingMouseEvents": true, "color": "#f59e0b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f59e0b", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
-            ).addTo(map);
-
-            var marker_label_3 = L.marker(
-                [32.5295096, -97.3411984],
-                {"interactive": false}
-            ).addTo(map);
-
-            var div_icon_3 = L.divIcon({
-                html: `<div>3</div>`,
-                className: "empty"
-            });
-
-            marker_label_3.setIcon(div_icon_3);
-            markerReferences[3] = marker_3;
-
-
-            // Property 4: SFR 3 - 509 NW Renfro St., Burleson
-            var marker_4 = L.marker(
-                [32.5486490, -97.3316600],
-                {}
-            ).addTo(map);
-
-            var icon_4 = L.AwesomeMarkers.icon(
-                {
-                    markerColor: "white",
-                    iconColor: "#a855f7",
-                    icon: "star",
-                    prefix: "fa",
-                    extraClasses: "fa-rotate-0"
-                }
-            );
-
-            var popup_4 = L.popup({
-                maxWidth: 350
-            });
-
-            var html_4 = $(`<div style="width: 100.0%; height: 100.0%;">
-        <div style="width: 300px; font-family: 'Inter', sans-serif;">
-            <h4 style="margin: 0 0 12px 0; color: #000000; font-weight: 700; font-size: 18px; font-family: 'Inter', sans-serif;">SFR 3</h4>
-            <p style="margin: 5px 0; font-weight: 600; color: #000000;"><strong>509 NW Renfro St.</strong></p>
-            <p style="margin: 5px 0; font-size: 13px; color: #000000; opacity: 0.7;">Burleson, TX</p>
-            <hr style="margin: 12px 0; border: none; border-top: 1px solid rgba(0,0,0,0.15);">
-            <p style="margin: 8px 0; font-size: 12px; color: #000000; opacity: 0.8; line-height: 1.6;">
-                📅 November 6, 2025<br>
-                📁 3 files (2 photos, 1 videos)
-            </p>
-            <a href="https://www.google.com/maps?q=32.5486490,-97.3316600" target="_blank" style="font-size: 12px; color: #3b82f6; font-weight: 600; text-decoration: none;">
-                📍 View on Google Maps
-            </a>
-
-            <div class="drive-buttons">
-                <a href="https://drive.google.com/open?id=1ffj1aLgX1iAmkQ24NTYsTnvuAEAjbW00&usp=drive_copy" target="_blank" class="drive-btn">
-                    📁 Open Folder
-                </a>
-                <button onclick="openGallery('1ffj1aLgX1iAmkQ24NTYsTnvuAEAjbW00', 'SFR 3: 509 NW Renfro St.')" class="drive-btn drive-btn-gallery">
-                    🖼️ View Gallery
-                </button>
-            </div>
-
-        </div>
-    </div>`)[0];
-            popup_4.setContent(html_4);
-
-            marker_4.bindPopup(popup_4);
-
-            marker_4.bindTooltip(
-                `<div>SFR 3: 509 NW Renfro St.</div>`,
-                { sticky: true }
-            );
-
-            marker_4.setIcon(icon_4);
-
-            var circle_marker_4 = L.circleMarker(
-                [32.5486490, -97.3316600],
-                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2, "interactive": false}
-            ).addTo(map);
-
-            var marker_label_4 = L.marker(
-                [32.5486490, -97.3316600],
-                {"interactive": false}
-            ).addTo(map);
-
-            var div_icon_4 = L.divIcon({
-                html: `<div>4</div>`,
-                className: "empty"
-            });
-
-            marker_label_4.setIcon(div_icon_4);
-            markerReferences[4] = marker_4;
+        marker_label.setIcon(div_icon);
+        markerReferences[property.num] = marker;
+    }
 
     // Focus marker function - zoom to marker and open popup
     function focusMarker(num) {
@@ -1331,9 +1214,11 @@
 
     // Initialize autocomplete service when Google Maps loads
     setTimeout(() => {
-        autocompleteService = new google.maps.places.AutocompleteService();
-        placesService = new google.maps.places.PlacesService(document.createElement('div'));
-    }, 1000);
+        if (typeof google !== 'undefined') {
+            autocompleteService = new google.maps.places.AutocompleteService();
+            placesService = new google.maps.places.PlacesService(document.createElement('div'));
+        }
+    }, 2000);
 
     // Handle search input with autocomplete
     function handleSearchInput() {
@@ -1464,12 +1349,12 @@
     }
 
 
-            L.control.fullscreen({
-                position: 'topleft',
-                title: 'Enter fullscreen mode',
-                titleCancel: 'Exit fullscreen mode',
-                forceSeparateButton: true
-            }).addTo(map);
+    L.control.fullscreen({
+        position: 'topleft',
+        title: 'Enter fullscreen mode',
+        titleCancel: 'Exit fullscreen mode',
+        forceSeparateButton: true
+    }).addTo(map);
 
     // Curtain reveal effect on page load
     window.addEventListener('load', function() {

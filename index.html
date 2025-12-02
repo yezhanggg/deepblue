@@ -888,42 +888,42 @@
             </div>
 
             <div class="projects" id="projectsGrid">
-                <a href="willowridge-1122/" class="project-card" data-year="2025" data-month="11">
+                <a href="1/" class="project-card" data-year="2025" data-month="11">
                     <div class="project-tag">Tour</div>
                     <h2>Willow Ridge Tour</h2>
                     <p>DFW &ndash; 11.20.25 - 11.21.25</p>
                     <span class="project-link">View Tour</span>
                 </a>
 
-                <a href="summercrest-1122/" class="project-card" data-year="2025" data-month="11">
+                <a href="2/" class="project-card" data-year="2025" data-month="11">
                     <div class="project-tag">Tour</div>
                     <h2>Summercrest Village Duplexes Tour</h2>
                     <p>DFW &ndash; 11.22.25</p>
                     <span class="project-link">View Tour</span>
                 </a>
 
-                <a href="summercrest-nov19/" class="project-card" data-year="2025" data-month="11">
+                <a href="3/" class="project-card" data-year="2025" data-month="11">
                     <div class="project-tag">Tour</div>
                     <h2>Summercrest Village Duplexes Tour</h2>
                     <p>DFW &ndash; 11.19.25</p>
                     <span class="project-link">View Tour</span>
                 </a>
 
-                <a href="summercrest/" class="project-card" data-year="2025" data-month="11">
+                <a href="4/" class="project-card" data-year="2025" data-month="11">
                     <div class="project-tag">Tour</div>
                     <h2>Summercrest Village Duplexes Tour</h2>
                     <p>DFW &ndash; 11.6.25</p>
                     <span class="project-link">View Tour</span>
                 </a>
 
-                <a href="willow-ridge/" class="project-card" data-year="2025" data-month="10">
+                <a href="5/" class="project-card" data-year="2025" data-month="10">
                     <div class="project-tag">Tour</div>
                     <h2>Willow Ridge Comps Tour</h2>
                     <p>DFW &ndash; 10.29.25 &ndash; 10.30.25</p>
                     <span class="project-link">View Tour</span>
                 </a>
 
-                <a href="flintridge/" class="project-card" data-year="2025" data-month="10">
+                <a href="6/" class="project-card" data-year="2025" data-month="10">
                     <div class="project-tag">Tour</div>
                     <h2>Flintridge Apartment Comps Tour</h2>
                     <p>DFW &ndash; 10.7.25</p>
@@ -947,7 +947,8 @@
     <script>
         (function() {
             const ACCESS_HASH = '5a0a428d869de24f31def000de2519b2b80fb9c75f08e7db2ecd14a4444bcdda';
-            const STORAGE_KEY = 'deepblue:access:v1';
+            const SESSION_KEY = 'deepblue:session:v1';
+            const ROOT_KEY = 'deepblue:root';
             const overlay = document.getElementById('accessOverlay');
             const form = document.getElementById('accessForm');
             const input = document.getElementById('accessInput');
@@ -956,6 +957,12 @@
 
             if (!overlay || !form || !input || !status) {
                 return;
+            }
+
+            try {
+                sessionStorage.removeItem(SESSION_KEY);
+            } catch (err) {
+                console.warn('Session storage unavailable', err);
             }
 
             const setStatus = (message, state) => {
@@ -971,10 +978,18 @@
             };
 
             const unlock = () => {
+                try {
+                    const rootPath = (window.location.pathname || '/').replace(/index\\.html$/, '');
+                    const normalizedRoot = rootPath.endsWith('/') ? rootPath : rootPath + '/';
+                    sessionStorage.setItem(SESSION_KEY, ACCESS_HASH);
+                    sessionStorage.setItem(ROOT_KEY, normalizedRoot);
+                } catch (err) {
+                    console.warn('Session storage unavailable', err);
+                }
+
                 document.body.classList.remove('locked');
                 overlay.classList.add('hide');
                 setStatus('Access granted', 'success');
-                localStorage.setItem(STORAGE_KEY, 'granted');
 
                 setTimeout(() => {
                     overlay.remove();
@@ -1023,11 +1038,6 @@
             }
 
             function primeGate() {
-                if (localStorage.getItem(STORAGE_KEY) === 'granted') {
-                    unlock();
-                    return;
-                }
-
                 document.body.classList.add('locked');
                 setStatus('Access required');
                 form.addEventListener('submit', handleSubmit);

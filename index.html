@@ -40,6 +40,224 @@
             z-index: 0;
         }
 
+        body.locked {
+            overflow: hidden;
+        }
+
+        body.locked header,
+        body.locked main,
+        body.locked footer {
+            filter: blur(12px);
+            pointer-events: none;
+            user-select: none;
+        }
+
+        /* Access Gate Styles */
+        .access-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 20000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 32px 24px;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.14) 0%, transparent 35%),
+                radial-gradient(circle at 80% 40%, rgba(255, 255, 255, 0.12) 0%, transparent 40%),
+                rgba(16, 12, 22, 0.55);
+            backdrop-filter: blur(18px) saturate(160%);
+            -webkit-backdrop-filter: blur(18px) saturate(160%);
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+
+        .access-overlay.hide {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .access-card {
+            position: relative;
+            width: min(520px, 100%);
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 24px;
+            padding: 28px 28px 26px;
+            box-shadow:
+                0 20px 70px rgba(0, 0, 0, 0.25),
+                inset 0 1px 0 rgba(255, 255, 255, 0.35);
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
+            overflow: hidden;
+        }
+
+        .access-card::before {
+            content: '';
+            position: absolute;
+            inset: -40% auto auto -20%;
+            width: 220px;
+            height: 220px;
+            background: radial-gradient(circle at 30% 30%,
+                rgba(255, 255, 255, 0.25),
+                rgba(255, 255, 255, 0));
+            filter: blur(22px);
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .access-card::after {
+            content: '';
+            position: absolute;
+            inset: auto -25% -35% auto;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle at 70% 70%,
+                rgba(181, 168, 196, 0.28),
+                rgba(181, 168, 196, 0));
+            filter: blur(20px);
+            opacity: 0.8;
+            pointer-events: none;
+        }
+
+        .access-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #f7f4ff;
+            background: linear-gradient(120deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08));
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            border-radius: 999px;
+            margin-bottom: 14px;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+        }
+
+        .access-title {
+            font-size: clamp(22px, 3vw, 28px);
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+
+        .access-copy {
+            color: rgba(255, 255, 255, 0.76);
+            font-weight: 500;
+            margin-bottom: 18px;
+        }
+
+        .access-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .access-label {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .access-field {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 14px;
+            padding: 6px 6px 6px 14px;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+        }
+
+        .access-field.error {
+            border-color: rgba(255, 214, 221, 0.8);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.25),
+                0 0 0 6px rgba(255, 214, 221, 0.12);
+        }
+
+        .access-field.success {
+            border-color: rgba(217, 255, 229, 0.9);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.25),
+                0 0 0 6px rgba(217, 255, 229, 0.12);
+        }
+
+        .access-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 10px 0;
+            letter-spacing: 0.08em;
+        }
+
+        .access-input:focus {
+            outline: none;
+        }
+
+        .access-button {
+            border: none;
+            border-radius: 12px;
+            padding: 12px 18px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            color: #1b1023;
+            background: linear-gradient(120deg, #f3e8ff 0%, #d8c6f0 50%, #f3e8ff 100%);
+            cursor: pointer;
+            box-shadow:
+                0 10px 25px rgba(0, 0, 0, 0.18),
+                inset 0 1px 0 rgba(255, 255, 255, 0.7);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .access-button:hover {
+            transform: translateY(-1px);
+            box-shadow:
+                0 14px 30px rgba(0, 0, 0, 0.25),
+                inset 0 1px 0 rgba(255, 255, 255, 0.7);
+        }
+
+        .access-button:active {
+            transform: translateY(0);
+        }
+
+        .access-status {
+            min-height: 18px;
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .access-status[data-state="error"] {
+            color: #ffd6dd;
+        }
+
+        .access-status[data-state="success"] {
+            color: #d9ffe5;
+        }
+
+        @media (max-width: 520px) {
+            .access-field {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 12px;
+            }
+
+            .access-button {
+                width: 100%;
+                text-align: center;
+            }
+        }
+
         .hero {
             position: relative;
             z-index: 1;
@@ -606,11 +824,28 @@
 
     </style>
 </head>
-<body>
+<body class="locked">
     <!-- Glassmorphism Curtain Effect -->
     <div class="curtain-center"></div>
     <div class="curtain-overlay curtain-left"></div>
     <div class="curtain-overlay curtain-right"></div>
+
+    <div id="accessOverlay" class="access-overlay" role="dialog" aria-modal="true" aria-labelledby="accessTitle">
+        <div class="access-card">
+            <div class="access-pill">Private Access</div>
+            <h2 class="access-title" id="accessTitle">Enter access code</h2>
+            <p class="access-copy">This page is restricted. Provide the code to continue to the tour directory.</p>
+            <form id="accessForm" class="access-form" autocomplete="off">
+                <label class="access-label" for="accessInput">Access code</label>
+                <div class="access-field">
+                    <input id="accessInput" class="access-input" name="access" type="password" inputmode="text" autocomplete="current-password" placeholder="************" required>
+                    <button type="submit" class="access-button">Unlock</button>
+                </div>
+                <div id="accessStatus" class="access-status" role="status" aria-live="polite"></div>
+            </form>
+        </div>
+    </div>
+
     <header class="hero">
         <div class="brand-container">
             <img src="image 1.png" alt="Deepblue Capital Partners emblem" class="brand-mark">
@@ -710,6 +945,98 @@
     </footer>
 
     <script>
+        (function() {
+            const ACCESS_HASH = '5a0a428d869de24f31def000de2519b2b80fb9c75f08e7db2ecd14a4444bcdda';
+            const STORAGE_KEY = 'deepblue:access:v1';
+            const overlay = document.getElementById('accessOverlay');
+            const form = document.getElementById('accessForm');
+            const input = document.getElementById('accessInput');
+            const status = document.getElementById('accessStatus');
+            const accessField = document.querySelector('.access-field');
+
+            if (!overlay || !form || !input || !status) {
+                return;
+            }
+
+            const setStatus = (message, state) => {
+                status.textContent = message || '';
+                status.dataset.state = state || '';
+
+                if (accessField) {
+                    accessField.classList.remove('error', 'success');
+                    if (state) {
+                        accessField.classList.add(state);
+                    }
+                }
+            };
+
+            const unlock = () => {
+                document.body.classList.remove('locked');
+                overlay.classList.add('hide');
+                setStatus('Access granted', 'success');
+                localStorage.setItem(STORAGE_KEY, 'granted');
+
+                setTimeout(() => {
+                    overlay.remove();
+                }, 420);
+            };
+
+            async function hashValue(value) {
+                if (!window.crypto || !window.crypto.subtle) {
+                    throw new Error('Secure hashing is not available in this browser.');
+                }
+
+                const buffer = await window.crypto.subtle.digest(
+                    'SHA-256',
+                    new TextEncoder().encode(value)
+                );
+                return Array.from(new Uint8Array(buffer))
+                    .map(byte => byte.toString(16).padStart(2, '0'))
+                    .join('');
+            }
+
+            async function handleSubmit(event) {
+                event.preventDefault();
+                const code = input.value.trim();
+
+                if (!code) {
+                    setStatus('Enter the code to continue.', 'error');
+                    input.focus();
+                    return;
+                }
+
+                setStatus('Verifying...');
+
+                try {
+                    const hashed = await hashValue(code);
+                    if (hashed === ACCESS_HASH) {
+                        unlock();
+                    } else {
+                        setStatus('That code is not recognized. Try again.', 'error');
+                        input.focus();
+                        input.select();
+                    }
+                } catch (err) {
+                    console.error(err);
+                    setStatus('Access check unavailable in this browser.', 'error');
+                }
+            }
+
+            function primeGate() {
+                if (localStorage.getItem(STORAGE_KEY) === 'granted') {
+                    unlock();
+                    return;
+                }
+
+                document.body.classList.add('locked');
+                setStatus('Access required');
+                form.addEventListener('submit', handleSubmit);
+                setTimeout(() => input.focus(), 150);
+            }
+
+            primeGate();
+        })();
+
         // Curtain reveal effect on page load
         window.addEventListener('load', function() {
             // Small delay to ensure everything is loaded
